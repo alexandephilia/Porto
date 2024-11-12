@@ -182,10 +182,14 @@ export const HeroSection = ({
             {typeof name === 'string' ? name.split("").map((letter, index) => (
               <span
                 key={index}
-                className="font-bold font-mono inline-block hover:animate-wave transition-all duration-300 group-hover:animate-wave touch-none"
+                className="inline-block hover:animate-wave transition-all duration-300 group-hover:animate-wave touch-none"
                 style={{
+                  fontFamily: '"Libre Bodoni", serif',
+                  fontStyle: 'italic',
+                  fontWeight: 600,
                   animationDelay: `${index * 0.05}s`,
-                  animationFillMode: "forwards"
+                  animationFillMode: "forwards",
+                  letterSpacing: '0.02em'
                 }}
               >
                 {letter === " " ? "\u00A0" : letter}
@@ -193,9 +197,11 @@ export const HeroSection = ({
             )) : name}
           </h1>
 
-          <Separator
-            className="w-96 mx-auto rounded-full"
-          />
+          <div className="w-96 mx-auto flex items-center gap-4">
+            <Separator className="flex-1" />
+            <div className="w-2 h-2 rounded-full bg-foreground/20" />
+            <Separator className="flex-1" />
+          </div>
 
           <p className="text-base md:text-lg leading-relaxed text-muted-foreground max-w-[500px] animate-fade-in-up opacity-0 [animation-delay:400ms] [animation-fill-mode:forwards]">
             {title}<br />
