@@ -23,33 +23,30 @@ const useLocation = () => {
     });
 
     useEffect(() => {
-        let watchId: number;
-
-        const isMobileDevice = () => {
-            return (
-                typeof window !== 'undefined' &&
-                (navigator.userAgent.match(/Android/i) ||
-                    navigator.userAgent.match(/webOS/i) ||
-                    navigator.userAgent.match(/iPhone/i) ||
-                    navigator.userAgent.match(/iPad/i) ||
-                    navigator.userAgent.match(/iPod/i) ||
-                    navigator.userAgent.match(/BlackBerry/i) ||
-                    navigator.userAgent.match(/Windows Phone/i))
-            );
-        };
-
         const getIPBasedLocation = async () => {
             try {
                 console.log("Fetching IP-based location...");
-                const response = await fetch('https://ipapi.co/json/');
-                const data = await response.json();
-                console.log("IP location data:", data);
+                const services = [
+                    'https://ipapi.co/json/',
+                    'https://ip.city/api/ip', // Add your API key if needed
+                    'https://ipwhois.app/json/' // Another alternative
+                ];
 
-                if (data.error) {
-                    throw new Error('IP location service error');
+                let data;
+                for (const service of services) {
+                    try {
+                        const response = await fetch(service);
+                        data = await response.json();
+                        if (!data.error) break;
+                    } catch (e) {
+                        console.log(`Service ${service} failed, trying next...`);
+                    }
                 }
 
-                // Get weather data using coordinates from IP
+                if (!data || data.error) {
+                    throw new Error('All IP location services failed');
+                }
+
                 const weatherResponse = await fetch(
                     `https://api.open-meteo.com/v1/forecast?latitude=${data.latitude}&longitude=${data.longitude}&current_weather=true&timezone=${encodeURIComponent(data.timezone)}`
                 );
@@ -64,7 +61,7 @@ const useLocation = () => {
                     error: null
                 });
             } catch (error) {
-                console.error('IP location error:', error);
+                console.error('Location error:', error);
                 setLocationData({
                     city: "Unknown",
                     country: "",
@@ -75,76 +72,7 @@ const useLocation = () => {
             }
         };
 
-        const getGPSLocation = async (latitude: number, longitude: number) => {
-            try {
-                console.log("Fetching GPS location data for:", latitude, longitude);
-                const reverseGeocode = await fetch(
-                    `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${latitude}&longitude=${longitude}`
-                );
-                const locationData = await reverseGeocode.json();
-                console.log("GPS location data:", locationData);
-
-                // Get timezone from coordinates
-                const timezoneResponse = await fetch(
-                    `https://api.timezonedb.com/v2.1/get-time-zone?key=YOUR_TIMEZONEDB_API_KEY&format=json&by=position&lat=${latitude}&lng=${longitude}`
-                );
-                const timezoneData = await timezoneResponse.json();
-
-                const weatherResponse = await fetch(
-                    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current_weather=true&timezone=${encodeURIComponent(timezoneData.zoneName)}`
-                );
-                const weatherData = await weatherResponse.json();
-
-                setLocationData({
-                    city: locationData.city || "Unknown",
-                    country: locationData.countryCode || "",
-                    timezone: timezoneData.zoneName || Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    temp: weatherData.current_weather?.temperature,
-                    loading: false,
-                    error: null
-                });
-            } catch (error) {
-                console.error('GPS location error:', error);
-                setLocationData({
-                    city: "Unknown",
-                    country: "",
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                    loading: false,
-                    error: error instanceof Error ? error.message : "Location error"
-                });
-            }
-        };
-
-        // Choose location method based on device type
-        if (isMobileDevice()) {
-            console.log("Mobile device detected, using GPS...");
-            if ('geolocation' in navigator) {
-                watchId = navigator.geolocation.watchPosition(
-                    (position) => {
-                        console.log("GPS position received:", position);
-                        getGPSLocation(position.coords.latitude, position.coords.longitude);
-                    },
-                    (err) => {
-                        console.error('GPS error:', err);
-                        // Fallback to IP-based location if GPS fails
-                        getIPBasedLocation();
-                    },
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                );
-            } else {
-                console.log("Geolocation not supported, falling back to IP...");
-                getIPBasedLocation();
-            }
-        } else {
-            console.log("Desktop device detected, using IP-based location...");
-            getIPBasedLocation();
-        }
-
-        return () => {
-            if (watchId) {
-                navigator.geolocation.clearWatch(watchId);
-            }
-        };
+        getIPBasedLocation();
     }, []);
 
     return locationData;
