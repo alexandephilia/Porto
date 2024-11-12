@@ -1,11 +1,105 @@
 import { Card } from "@/components/ui/card";
-import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { Play, Pause, RotateCcw, Coffee, Brain } from "lucide-react";
+import React, { useEffect, useRef, useState, Fragment } from "react";
+import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { Play, Pause, RotateCcw, Coffee, Brain, Sun, Mountain, Rocket, Moon } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { AnimatePresence } from "framer-motion";
 
 type TimerMode = 'work' | 'break';
+
+const getTimeBasedTheme = () => {
+    const hour = new Date().getHours();
+
+    if (hour >= 6 && hour < 12) {
+        return {
+            text: "Rise & Grind",
+            icon: "sun",
+            colors: {
+                bg: "bg-amber-500/10 dark:bg-amber-400/10",
+                border: "border-amber-500/20 dark:border-amber-400/20",
+                hover: "hover:bg-amber-500/20 dark:hover:bg-amber-400/20",
+                text: "text-amber-700 dark:text-amber-300",
+                iconColor: "text-amber-600 dark:text-amber-400"
+            }
+        };
+    } else if (hour >= 12 && hour < 17) {
+        return {
+            text: "Peak Focus",
+            icon: "mountain",
+            colors: {
+                bg: "bg-sky-500/10 dark:bg-sky-400/10",
+                border: "border-sky-500/20 dark:border-sky-400/20",
+                hover: "hover:bg-sky-500/20 dark:hover:bg-sky-400/20",
+                text: "text-sky-700 dark:text-sky-300",
+                iconColor: "text-sky-600 dark:text-sky-400"
+            }
+        };
+    } else if (hour >= 17 && hour < 22) {
+        return {
+            text: "Final Sprint",
+            icon: "rocket",
+            colors: {
+                bg: "bg-orange-500/10 dark:bg-orange-400/10",
+                border: "border-orange-500/20 dark:border-orange-400/20",
+                hover: "hover:bg-orange-500/20 dark:hover:bg-orange-400/20",
+                text: "text-orange-700 dark:text-orange-300",
+                iconColor: "text-orange-600 dark:text-orange-400"
+            }
+        };
+    } else {
+        return {
+            text: "Night Owl",
+            icon: "moon",
+            colors: {
+                bg: "bg-indigo-500/10 dark:bg-indigo-400/10",
+                border: "border-indigo-500/20 dark:border-indigo-400/20",
+                hover: "hover:bg-indigo-500/20 dark:hover:bg-indigo-400/20",
+                text: "text-indigo-700 dark:text-indigo-300",
+                iconColor: "text-indigo-600 dark:text-indigo-400"
+            }
+        };
+    }
+};
+
+const AnimatedNumber = ({ number }: { number: string }) => {
+    return (
+        <div className="relative w-10 h-[1.2em] inline-flex items-center justify-center overflow-hidden">
+            <AnimatePresence mode="popLayout">
+                <motion.div
+                    key={number}
+                    initial={{
+                        y: -100,
+                        opacity: 0,
+                        filter: "blur(8px)"
+                    }}
+                    animate={{
+                        y: 0,
+                        opacity: 1,
+                        filter: "blur(0px)"
+                    }}
+                    exit={{
+                        y: 100,
+                        opacity: 0,
+                        filter: "blur(8px)"
+                    }}
+                    transition={{
+                        duration: 0.3,
+                        ease: [0.32, 0.72, 0, 1],
+                        type: "spring",
+                        stiffness: 200,
+                        damping: 30
+                    }}
+                    className="absolute inset-0 flex items-center justify-center"
+                    style={{
+                        backfaceVisibility: 'hidden',
+                        transform: 'translateZ(0)',
+                    }}
+                >
+                    {number}
+                </motion.div>
+            </AnimatePresence>
+        </div>
+    );
+};
 
 export const PomodoroCard = () => {
     const [isHovered, setIsHovered] = useState(false);
@@ -17,6 +111,8 @@ export const PomodoroCard = () => {
     const [taskInput, setTaskInput] = useState('');
     const [currentTask, setCurrentTask] = useState('');
     const inputRef = useRef<HTMLInputElement>(null);
+    const [taskColor, setTaskColor] = useState('');
+    const [timeTheme, setTimeTheme] = useState(getTimeBasedTheme());
 
     const { scrollYProgress } = useScroll({
         target: cardRef,
@@ -58,6 +154,14 @@ export const PomodoroCard = () => {
         return () => clearInterval(interval);
     }, [isRunning, timeLeft, mode]);
 
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setTimeTheme(getTimeBasedTheme());
+        }, 60000); // Update every minute
+
+        return () => clearInterval(interval);
+    }, []);
+
     const formatTime = (seconds: number) => {
         const minutes = Math.floor(seconds / 60);
         const remainingSeconds = seconds % 60;
@@ -73,10 +177,21 @@ export const PomodoroCard = () => {
         setIsRunning(!isRunning);
     };
 
+    const getComplementaryColor = (hue: number) => {
+        const complementaryHue = (hue + 180) % 360;
+        return {
+            primary: `hsla(${hue}, 100%, 85%, 0.2)`,
+            complementary: `hsla(${complementaryHue}, 100%, 85%, 0.1)`,
+            border: `hsla(${hue}, 100%, 75%, 0.3)`
+        };
+    };
+
     const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === 'Enter' && taskInput.trim()) {
             setCurrentTask(taskInput);
             setTaskInput('');
+            const hue = Math.floor(Math.random() * 360);
+            setTaskColor(JSON.stringify(getComplementaryColor(hue)));
             if (inputRef.current) {
                 inputRef.current.blur();
             }
@@ -110,19 +225,35 @@ export const PomodoroCard = () => {
                             exit={{ opacity: 0, filter: "blur(4px)" }}
                             className="absolute top-6 right-6 max-w-[200px]"
                         >
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-                                <p className="text-sm truncate">{currentTask}</p>
+                            <div
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-[2px] shadow-sm transition-all duration-300"
+                                style={{
+                                    background: `linear-gradient(135deg, ${JSON.parse(taskColor).primary}, ${JSON.parse(taskColor).complementary})`,
+                                    border: `1px solid ${JSON.parse(taskColor).border}`,
+                                    boxShadow: `0 2px 10px ${JSON.parse(taskColor).complementary}`,
+                                }}
+                            >
+                                <p className="text-sm font-medium">{currentTask}</p>
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
                 <div className="flex justify-between items-center mb-6">
-                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors
+                        ${mode === 'work' ? timeTheme.colors.bg : 'bg-black/5 dark:bg-white/5'}
+                        ${mode === 'work' ? timeTheme.colors.border : 'border-black/10 dark:border-white/10'}
+                        border`}
+                    >
                         {mode === 'work' ? (
                             <>
-                                <Brain className="h-4 w-4" />
-                                <span className="text-sm font-medium">Podomoro</span>
+                                {timeTheme.icon === 'sun' && <Sun className={`h-4 w-4 ${timeTheme.colors.iconColor}`} />}
+                                {timeTheme.icon === 'mountain' && <Mountain className={`h-4 w-4 ${timeTheme.colors.iconColor}`} />}
+                                {timeTheme.icon === 'rocket' && <Rocket className={`h-4 w-4 ${timeTheme.colors.iconColor}`} />}
+                                {timeTheme.icon === 'moon' && <Moon className={`h-4 w-4 ${timeTheme.colors.iconColor}`} />}
+                                <span className={`text-sm font-medium ${timeTheme.colors.text}`}>
+                                    {timeTheme.text}
+                                </span>
                             </>
                         ) : (
                             <>
@@ -134,8 +265,16 @@ export const PomodoroCard = () => {
                 </div>
 
                 <div className="flex items-center justify-center mb-6">
-                    <span className="text-6xl font-mono font-bold">
-                        {formatTime(timeLeft)}
+                    <span className="text-6xl font-mono font-bold flex items-center justify-center gap-1">
+                        {formatTime(timeLeft).split('').map((digit, index, array) => (
+                            <Fragment key={`${index}-${digit}`}>
+                                {digit === ':' ? (
+                                    <div className="w-6 flex justify-center">:</div>
+                                ) : (
+                                    <AnimatedNumber number={digit} />
+                                )}
+                            </Fragment>
+                        ))}
                     </span>
                 </div>
 

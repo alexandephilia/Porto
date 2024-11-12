@@ -512,17 +512,17 @@ export const TimerCard = () => {
 
                 <div className="mb-6">{generateProgressBars()}</div>
 
-                <div className="flex items-baseline gap-2 mb-6">
-                    <div className="flex flex-col items-start">
-                        <div className="flex items-baseline gap-1">
-                            <span className="text-4xl font-mono font-bold">
+                <div className="flex justify-center items-center mb-6">
+                    <div className="flex flex-col items-center">
+                        <div className="flex items-baseline gap-2">
+                            <span className="text-4xl sm:text-5xl font-mono font-bold tracking-wider">
                                 {formatTime(currentTime).time}
                             </span>
-                            <span className="text-sm font-mono text-muted-foreground">
+                            <span className="text-sm sm:text-base font-mono text-muted-foreground">
                                 {formatTime(currentTime).period}
                             </span>
                         </div>
-                        <span className="text-[10px] text-muted-foreground/60 -mt-1 ml-1">
+                        <span className="text-xs text-muted-foreground/60 mt-2">
                             local time
                         </span>
                     </div>
