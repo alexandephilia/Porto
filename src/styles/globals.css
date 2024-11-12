@@ -1,0 +1,53 @@
+@keyframes shine {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: -200% center;
+  }
+}
+
+.animate-shine {
+  animation: shine 3s linear infinite;
+}
+
+/* Combined touch prevention classes - Modified to allow clicks */
+.prevent-drag {
+  -webkit-user-drag: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-touch-callout: none !important;
+}
+
+.touch-none {
+  touch-action: none !important;
+  -webkit-touch-callout: none !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+/* Global touch prevention - Modified to allow clicks */
+:root {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text selection globally but allow clicks */
+* {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Add classes for clickable elements */
+.clickable {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+}
+
+/* Add this class to your buttons */
+.button-clickable {
+  pointer-events: auto !important;
+  cursor: pointer !important;
+  z-index: 50;
+  position: relative;
+}
