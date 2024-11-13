@@ -5,34 +5,6 @@ import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
 
-const calculateExpression = (input: string): string | null => {
-    try {
-        // Remove whitespace
-        const cleanInput = input.replace(/\s+/g, '');
-
-        // Basic validation
-        if (!cleanInput.match(/^[\d+\-*/.()%\s]+$/)) return null;
-
-        // Handle percentage calculations
-        if (cleanInput.includes('%')) {
-            const parts = cleanInput.split('%');
-            if (parts.length === 2) {
-                const num = parseFloat(parts[0]);
-                const total = parseFloat(parts[1]);
-                return String((num / 100) * total);
-            }
-            return null;
-        }
-
-        // Evaluate the expression
-        // eslint-disable-next-line no-eval
-        const result = eval(cleanInput);
-        return Number.isFinite(result) ? String(result) : null;
-    } catch {
-        return null;
-    }
-};
-
 const Command = React.forwardRef<
     React.ElementRef<typeof CommandPrimitive>,
     React.ComponentPropsWithoutRef<typeof CommandPrimitive>
@@ -43,11 +15,6 @@ const Command = React.forwardRef<
             "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
             className
         )}
-        shouldFilter={false}
-        filter={(value, search) => {
-            if (!search) return 1
-            return value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
-        }}
         {...props}
     />
 ))
@@ -62,13 +29,6 @@ interface CommandDialogProps {
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
     const dialogRef = React.useRef<HTMLDivElement>(null);
 
-    // Add this function to detect mobile devices
-    const isMobile = () => {
-        if (typeof window === 'undefined') return false;
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-    };
-
-    // Handle ESC key
     React.useEffect(() => {
         const handleEsc = (event: KeyboardEvent) => {
             if (event.key === 'Escape' && props.open) {
@@ -139,7 +99,6 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
                                     >
                                         <Command
                                             className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
-                                            shouldFilter={!isMobile()}
                                         >
                                             {children}
                                         </Command>
@@ -153,7 +112,6 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
         </DialogPrimitive.Root>
     )
 }
-CommandDialog.displayName = "CommandDialog"
 
 const CommandInput = React.forwardRef<
     React.ElementRef<typeof CommandPrimitive.Input>,
@@ -163,47 +121,33 @@ const CommandInput = React.forwardRef<
         onExternalValueChange?: (value: string) => void;
         value?: string;
     }
->(({ className, isCalculatorMode, isConverterMode, onExternalValueChange, value, ...props }, ref) => {
-    const [wasCleared, setWasCleared] = React.useState(false);
-
-    const handleValueChange = (newValue: string) => {
-        if (newValue === '') {
-            setWasCleared(true);
-            setTimeout(() => setWasCleared(false), 0);
-        }
-        onExternalValueChange?.(newValue);
-    };
-
-    return (
-        <div className="flex items-center border-b px-3 relative" cmdk-input-wrapper="">
-            {isCalculatorMode ? (
-                <Calculator className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            ) : isConverterMode ? (
-                <ArrowLeftRight className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            ) : (
-                <Terminal className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+>(({ className, isCalculatorMode, isConverterMode, onExternalValueChange, value, ...props }, ref) => (
+    <div className="flex items-center border-b px-3 relative" cmdk-input-wrapper="">
+        {isCalculatorMode ? (
+            <Calculator className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+        ) : isConverterMode ? (
+            <ArrowLeftRight className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+        ) : (
+            <Terminal className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+        )}
+        <CommandPrimitive.Input
+            ref={ref}
+            value={value}
+            className={cn(
+                "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 pr-12",
+                className
             )}
-            <CommandPrimitive.Input
-                ref={ref}
-                value={value}
-                className={cn(
-                    "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 pr-12",
-                    className
-                )}
-                onValueChange={handleValueChange}
-                autoComplete="off"
-                autoCorrect="off"
-                spellCheck="false"
-                data-lpignore="true"
-                {...props}
-            />
-            <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground opacity-60">
-                ESC
-            </kbd>
-        </div>
-    );
-});
-CommandInput.displayName = CommandPrimitive.Input.displayName
+            onValueChange={onExternalValueChange}
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck="false"
+            {...props}
+        />
+        <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground opacity-60">
+            ESC
+        </kbd>
+    </div>
+));
 
 const CommandList = React.forwardRef<
     React.ElementRef<typeof CommandPrimitive.List>,
@@ -215,7 +159,6 @@ const CommandList = React.forwardRef<
         {...props}
     />
 ))
-CommandList.displayName = CommandPrimitive.List.displayName
 
 const CommandEmpty = React.forwardRef<
     React.ElementRef<typeof CommandPrimitive.Empty>,
@@ -227,7 +170,6 @@ const CommandEmpty = React.forwardRef<
         {...props}
     />
 ))
-CommandEmpty.displayName = CommandPrimitive.Empty.displayName
 
 const CommandGroup = React.forwardRef<
     React.ElementRef<typeof CommandPrimitive.Group>,
@@ -242,19 +184,6 @@ const CommandGroup = React.forwardRef<
         {...props}
     />
 ))
-CommandGroup.displayName = CommandPrimitive.Group.displayName
-
-const CommandSeparator = React.forwardRef<
-    React.ElementRef<typeof CommandPrimitive.Separator>,
-    React.ComponentPropsWithoutRef<typeof CommandPrimitive.Separator>
->(({ className, ...props }, ref) => (
-    <CommandPrimitive.Separator
-        ref={ref}
-        className={cn("-mx-1 h-px bg-border", className)}
-        {...props}
-    />
-))
-CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
 const CommandItem = React.forwardRef<
     React.ElementRef<typeof CommandPrimitive.Item>,
@@ -270,12 +199,7 @@ const CommandItem = React.forwardRef<
     >
         <motion.div
             variants={{
-                hidden: {
-                    opacity: 0,
-                    x: -20,
-                    scale: 0.95,
-                    filter: "blur(10px)"
-                },
+                hidden: { opacity: 0, x: -20, scale: 0.95, filter: "blur(10px)" },
                 show: {
                     opacity: 1,
                     x: 0,
@@ -283,11 +207,11 @@ const CommandItem = React.forwardRef<
                     filter: "blur(0px)",
                     transition: {
                         type: "spring",
-                        stiffness: 80, // Reduced for smoother motion
-                        damping: 16, // Increased damping for slower movement
-                        mass: 1.2, // Slightly increased mass
-                        duration: 1.5, // Longer duration
-                        velocity: 0.3 // Added lower velocity for smoother motion
+                        stiffness: 80,
+                        damping: 16,
+                        mass: 1.2,
+                        duration: 1.5,
+                        velocity: 0.3
                     }
                 }
             }}
@@ -299,23 +223,6 @@ const CommandItem = React.forwardRef<
         </motion.div>
     </CommandPrimitive.Item>
 ))
-CommandItem.displayName = CommandPrimitive.Item.displayName
-
-const CommandShortcut = ({
-    className,
-    ...props
-}: React.HTMLAttributes<HTMLSpanElement>) => {
-    return (
-        <span
-            className={cn(
-                "ml-auto text-xs tracking-widest text-muted-foreground",
-                className
-            )}
-            {...props}
-        />
-    )
-}
-CommandShortcut.displayName = "CommandShortcut"
 
 export {
     Command,
@@ -325,6 +232,4 @@ export {
     CommandEmpty,
     CommandGroup,
     CommandItem,
-    CommandShortcut,
-    CommandSeparator,
 } 

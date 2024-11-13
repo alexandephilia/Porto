@@ -11,7 +11,6 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
-  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -359,7 +358,7 @@ const FloatingMenu = () => {
     }
   };
 
-  // Update the input handler
+  // Update the input handler to check for both calculator and converter modes
   const handleInputChange = (value: string) => {
     setInputValue(value);
 
@@ -392,20 +391,16 @@ const FloatingMenu = () => {
       if (isConversion) {
         setIsConverterMode(true);
         setIsCalculatorMode(false);
-        setIsCurrencyMode(false);
         const result = handleUnitConversion(value);
         setConversionResult(result);
         setCalculationResult(null);
-        setCurrencyResult(null);
       } else {
         // Check if it contains any math operators or numbers
         const hasCalculation = /[\d+\-*×x÷/().%]|of/i.test(value);
         if (hasCalculation) {
           setIsConverterMode(false);
           setIsCalculatorMode(true);
-          setIsCurrencyMode(false);
           setConversionResult(null);
-          setCurrencyResult(null);
           calculateResult(value.replace(/\s+/g, '')); // Remove spacing restrictions
         }
       }
@@ -483,243 +478,223 @@ const FloatingMenu = () => {
         open={showCommandDialog}
         onOpenChange={setShowCommandDialog}
       >
-        <motion.div
-          className="rounded-lg border bg-popover shadow-lg overflow-hidden"
-          initial={{ filter: "blur(12px)" }}
-          animate={{ filter: "blur(0px)" }}
-          exit={{ filter: "blur(12px)" }}
-          transition={{
-            duration: 0.3,
-            delay: 0.2
+        <CommandInput
+          placeholder="Type command or calculate..."
+          onExternalValueChange={handleInputChange}
+          isCalculatorMode={isCalculatorMode}
+          isConverterMode={isConverterMode}
+          value={inputValue}
+          autoFocus={false}
+          readOnly={true}
+          onFocus={(e) => {
+            // Prevent zoom on focus
+            e.target.setAttribute('readonly', 'true');
+            setTimeout(() => {
+              e.target.removeAttribute('readonly');
+            }, 100);
           }}
-        >
-          <Command
-            className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
-            shouldFilter={false}
-            filter={(value, search) => {
-              if (!search) return 1
-              return value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
-            }}
-          >
-            <CommandInput
-              placeholder="Type command or calculate..."
-              onExternalValueChange={handleInputChange}
-              isCalculatorMode={isCalculatorMode}
-              isConverterMode={isConverterMode}
-              value={inputValue}
-              autoFocus={false}
-              readOnly={true}
-              onFocus={(e) => {
-                // Prevent zoom on focus
-                e.target.setAttribute('readonly', 'true');
-                setTimeout(() => {
-                  e.target.removeAttribute('readonly');
-                }, 100);
-              }}
-            />
-            <CommandList>
-              <CommandEmpty>
-                {isCalculatorMode && calculationResult ? (
-                  <motion.div
-                    className="px-3 -my-3 flex items-center gap-2"
-                    key={calculationResult}
-                    initial={{ scale: 1, filter: "blur(0px)" }}
-                    animate={{
-                      scale: [1, 1.05, 1],
-                      filter: ["blur(0px)", "blur(2px)", "blur(0px)"]
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      times: [0, 0.5, 1],
-                      scale: {
-                        ease: [0.22, 1, 0.36, 1],
-                      },
-                      filter: {
-                        ease: "easeInOut",
-                        delay: 0.1
-                      }
-                    }}
-                  >
-                    <Calculator className="h-4 w-4 text-orange-500 animate-pulse" />
-                    <span className="text-orange-500 font-bold text-base tracking-wider animate-pulse 
-                      [text-shadow:0_0_1px_theme(colors.orange.500),0_0_15px_theme(colors.orange.500/40),0_0_30px_theme(colors.orange.500/20)] 
-                      [-webkit-text-stroke:0.25px_theme(colors.orange.600/30)]
-                      [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
-                      = {calculationResult}
-                    </span>
-                  </motion.div>
-                ) : isConverterMode && conversionResult ? (
-                  <motion.div
-                    className="px-3 -my-3 flex items-center gap-2"
-                    key={conversionResult}
-                    initial={{ scale: 1, filter: "blur(0px)" }}
-                    animate={{
-                      scale: [1, 1.05, 1],
-                      filter: ["blur(0px)", "blur(2px)", "blur(0px)"]
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      times: [0, 0.5, 1],
-                      scale: {
-                        ease: [0.22, 1, 0.36, 1],
-                      },
-                      filter: {
-                        ease: "easeInOut",
-                        delay: 0.1
-                      }
-                    }}
-                  >
-                    <ArrowLeftRight className="h-4 w-4 text-blue-500 animate-pulse" />
-                    <span className="text-blue-500 font-bold text-base tracking-wider animate-pulse
-                      [text-shadow:0_0_1px_theme(colors.blue.500),0_0_15px_theme(colors.blue.500/40),0_0_30px_theme(colors.blue.500/20)]
-                      [-webkit-text-stroke:0.25px_theme(colors.blue.600/30)]
-                      [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
-                      = {conversionResult}
-                    </span>
-                  </motion.div>
-                ) : isCurrencyMode && currencyResult ? (
-                  <motion.div
-                    className="px-3 -my-3 flex items-center gap-2"
-                    key={currencyResult}
-                    initial={{ scale: 1, filter: "blur(0px)" }}
-                    animate={{
-                      scale: [1, 1.05, 1],
-                      filter: ["blur(0px)", "blur(2px)", "blur(0px)"]
-                    }}
-                    transition={{
-                      duration: 0.5,
-                      times: [0, 0.5, 1],
-                      scale: {
-                        ease: [0.22, 1, 0.36, 1],
-                      },
-                      filter: {
-                        ease: "easeInOut",
-                        delay: 0.1
-                      }
-                    }}
-                  >
-                    <DollarSign className="h-4 w-4 text-green-500 animate-pulse" />
-                    <span className="text-green-500 font-bold text-base tracking-wider animate-pulse
-                      [text-shadow:0_0_1px_theme(colors.green.500),0_0_15px_theme(colors.green.500/40),0_0_30px_theme(colors.green.500/20)]
-                      [-webkit-text-stroke:0.25px_theme(colors.green.600/30)]
-                      [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
-                      = {currencyResult}
-                    </span>
-                  </motion.div>
-                ) : (
-                  !isCalculatorMode && !isConverterMode && !isCurrencyMode && (
-                    <div className="py-6 text-center text-sm">
-                      No results found.
-                    </div>
-                  )
-                )}
-              </CommandEmpty>
-              <CommandGroup heading="Tools">
-                {/* Calculator Tool */}
-                <CommandItem
-                  onSelect={handleCalculatorExample}
-                  className="cursor-none flex items-center gap-2"
-                >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
-                    <Calculator className="h-4 w-4" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm">Calculate</span>
-                    <span className="text-xs text-muted-foreground">
-                      Basic math and percentage calculations
-                    </span>
-                  </div>
-                </CommandItem>
+        />
+        <CommandList>
+          <CommandEmpty>
+            {isCalculatorMode && calculationResult ? (
+              <motion.div
+                className="px-3 -my-3 flex items-center gap-2"
+                key={calculationResult}
+                initial={{ scale: 1, filter: "blur(0px)" }}
+                animate={{
+                  scale: [1, 1.05, 1],
+                  filter: ["blur(0px)", "blur(2px)", "blur(0px)"]
+                }}
+                transition={{
+                  duration: 0.5,
+                  times: [0, 0.5, 1],
+                  scale: {
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                  filter: {
+                    ease: "easeInOut",
+                    delay: 0.1
+                  }
+                }}
+              >
+                <Calculator className="h-4 w-4 text-orange-500 animate-pulse" />
+                <span className="text-orange-500 font-bold text-base tracking-wider animate-pulse 
+                  [text-shadow:0_0_1px_theme(colors.orange.500),0_0_15px_theme(colors.orange.500/40),0_0_30px_theme(colors.orange.500/20)] 
+                  [-webkit-text-stroke:0.25px_theme(colors.orange.600/30)]
+                  [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
+                  = {calculationResult}
+                </span>
+              </motion.div>
+            ) : isConverterMode && conversionResult ? (
+              <motion.div
+                className="px-3 -my-3 flex items-center gap-2"
+                key={conversionResult}
+                initial={{ scale: 1, filter: "blur(0px)" }}
+                animate={{
+                  scale: [1, 1.05, 1],
+                  filter: ["blur(0px)", "blur(2px)", "blur(0px)"]
+                }}
+                transition={{
+                  duration: 0.5,
+                  times: [0, 0.5, 1],
+                  scale: {
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                  filter: {
+                    ease: "easeInOut",
+                    delay: 0.1
+                  }
+                }}
+              >
+                <ArrowLeftRight className="h-4 w-4 text-blue-500 animate-pulse" />
+                <span className="text-blue-500 font-bold text-base tracking-wider animate-pulse
+                  [text-shadow:0_0_1px_theme(colors.blue.500),0_0_15px_theme(colors.blue.500/40),0_0_30px_theme(colors.blue.500/20)]
+                  [-webkit-text-stroke:0.25px_theme(colors.blue.600/30)]
+                  [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
+                  = {conversionResult}
+                </span>
+              </motion.div>
+            ) : isCurrencyMode && currencyResult ? (
+              <motion.div
+                className="px-3 -my-3 flex items-center gap-2"
+                key={currencyResult}
+                initial={{ scale: 1, filter: "blur(0px)" }}
+                animate={{
+                  scale: [1, 1.05, 1],
+                  filter: ["blur(0px)", "blur(2px)", "blur(0px)"]
+                }}
+                transition={{
+                  duration: 0.5,
+                  times: [0, 0.5, 1],
+                  scale: {
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                  filter: {
+                    ease: "easeInOut",
+                    delay: 0.1
+                  }
+                }}
+              >
+                <DollarSign className="h-4 w-4 text-green-500 animate-pulse" />
+                <span className="text-green-500 font-bold text-base tracking-wider animate-pulse
+                  [text-shadow:0_0_1px_theme(colors.green.500),0_0_15px_theme(colors.green.500/40),0_0_30px_theme(colors.green.500/20)]
+                  [-webkit-text-stroke:0.25px_theme(colors.green.600/30)]
+                  [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
+                  = {currencyResult}
+                </span>
+              </motion.div>
+            ) : (
+              !isCalculatorMode && !isConverterMode && !isCurrencyMode && (
+                <div className="py-6 text-center text-sm">
+                  No results found.
+                </div>
+              )
+            )}
+          </CommandEmpty>
+          <CommandGroup heading="Tools">
+            {/* Calculator Tool */}
+            <CommandItem
+              onSelect={handleCalculatorExample}
+              className="cursor-none flex items-center gap-2"
+            >
+              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
+                <Calculator className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm">Calculate</span>
+                <span className="text-xs text-muted-foreground">
+                  Basic math and percentage calculations
+                </span>
+              </div>
+            </CommandItem>
 
-                {/* Calculator Examples - Only show when no search input */}
-                {!inputValue && (
-                  <div className="px-2 py-1.5 border-b mb-2">
-                    <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
-                      <span className="opacity-70">Examples:</span>
-                      <div className="flex gap-2">
-                        <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
-                          2 + 2
-                        </span>
-                        <span className="opacity-50">·</span>
-                        <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
-                          15% of 80
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {/* Units Tool */}
-                <CommandItem
-                  onSelect={handleConverterExample}
-                  className="cursor-none flex items-center gap-2"
-                >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
-                    <ArrowLeftRight className="h-4 w-4" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm">Units</span>
-                    <span className="text-xs text-muted-foreground">
-                      Length, weight, and temperature
+            {/* Calculator Examples - Only show when no search input */}
+            {!inputValue && (
+              <div className="px-2 py-1.5 border-b mb-2">
+                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                  <span className="opacity-70">Examples:</span>
+                  <div className="flex gap-2">
+                    <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                      2 + 2
+                    </span>
+                    <span className="opacity-50">·</span>
+                    <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                      15% of 80
                     </span>
                   </div>
-                </CommandItem>
+                </div>
+              </div>
+            )}
 
-                {/* Units Examples - Only show when no search input */}
-                {!inputValue && (
-                  <div className="px-2 py-1.5 border-b mb-2">
-                    <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
-                      <span className="opacity-70">Examples:</span>
-                      <div className="flex gap-2">
-                        <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
-                          5km to miles
-                        </span>
-                        <span className="opacity-50">·</span>
-                        <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
-                          100f to c
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
+            {/* Units Tool */}
+            <CommandItem
+              onSelect={handleConverterExample}
+              className="cursor-none flex items-center gap-2"
+            >
+              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
+                <ArrowLeftRight className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm">Units</span>
+                <span className="text-xs text-muted-foreground">
+                  Length, weight, and temperature
+                </span>
+              </div>
+            </CommandItem>
 
-                {/* Currency Tool */}
-                <CommandItem
-                  onSelect={handleCurrencyExample}
-                  className="cursor-none flex items-center gap-2"
-                >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
-                    <DollarSign className="h-4 w-4" />
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <span className="text-sm">Currency</span>
-                    <span className="text-xs text-muted-foreground">
-                      Real-time exchange rates
+            {/* Units Examples - Only show when no search input */}
+            {!inputValue && (
+              <div className="px-2 py-1.5 border-b mb-2">
+                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                  <span className="opacity-70">Examples:</span>
+                  <div className="flex gap-2">
+                    <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                      5km to miles
+                    </span>
+                    <span className="opacity-50">·</span>
+                    <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                      100f to c
                     </span>
                   </div>
-                </CommandItem>
+                </div>
+              </div>
+            )}
 
-                {/* Currency Examples - Only show when no search input */}
-                {!inputValue && (
-                  <div className="px-2 py-1.5">
-                    <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
-                      <span className="opacity-70">Examples:</span>
-                      <div className="flex gap-2">
-                        <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
-                          1,000 usd to eur
-                        </span>
-                        <span className="opacity-50">·</span>
-                        <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
-                          1,000,000 jpy to usd
-                        </span>
-                      </div>
-                    </div>
+            {/* Currency Tool */}
+            <CommandItem
+              onSelect={handleCurrencyExample}
+              className="cursor-none flex items-center gap-2"
+            >
+              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
+                <DollarSign className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm">Currency</span>
+                <span className="text-xs text-muted-foreground">
+                  Real-time exchange rates
+                </span>
+              </div>
+            </CommandItem>
+
+            {/* Currency Examples - Only show when no search input */}
+            {!inputValue && (
+              <div className="px-2 py-1.5">
+                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                  <span className="opacity-70">Examples:</span>
+                  <div className="flex gap-2">
+                    <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                      1,000 usd to eur
+                    </span>
+                    <span className="opacity-50">·</span>
+                    <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                      1,000,000 jpy to usd
+                    </span>
                   </div>
-                )}
-              </CommandGroup>
-            </CommandList>
-          </Command>
-        </motion.div>
+                </div>
+              </div>
+            )}
+          </CommandGroup>
+        </CommandList>
       </CommandDialog>
 
       {/* Fixed positioning for floating menu */}
