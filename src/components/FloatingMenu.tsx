@@ -146,15 +146,15 @@ interface CurrencyConversion {
 }
 
 const currencyExamples = [
-  "100 usd to eur",
-  "50 eur to gbp",
-  "1000 jpy to usd",
-  "25 gbp to eur",
-  "75 aud to usd",
-  "500 cad to eur",
-  "1000000 idr to usd",
-  "100 usd to idr",
-  "500000 idr to eur"
+  "1,000 usd to eur",
+  "50,000 eur to gbp",
+  "1,000,000 jpy to usd",
+  "2,500 gbp to eur",
+  "7,500 aud to usd",
+  "500,000 cad to eur",
+  "1,000,000 idr to usd",
+  "100,000 usd to idr",
+  "500,000 idr to eur"
 ];
 
 // Add this function to fetch exchange rates
@@ -372,8 +372,8 @@ const FloatingMenu = () => {
       return;
     }
 
-    // Check for currency pattern first
-    const currencyPattern = /(\d+\.?\d*)\s*([a-zA-Z]{3})\s*(?:to|in)\s*([a-zA-Z]{3})/i;
+    // Updated currency pattern to handle commas
+    const currencyPattern = /([0-9,]+\.?\d*)\s*([a-zA-Z]{3})\s*(?:to|in)\s*([a-zA-Z]{3})/i;
     const isCurrency = currencyPattern.test(value);
 
     if (isCurrency) {
@@ -440,11 +440,13 @@ const FloatingMenu = () => {
 
   // Update the handleCurrencyConversion function
   const handleCurrencyConversion = async (input: string) => {
-    const match = input.match(/(\d+\.?\d*)\s*([a-zA-Z]{3})\s*(?:to|in)\s*([a-zA-Z]{3})/i);
+    // Updated pattern to handle commas in numbers
+    const match = input.match(/([0-9,]+\.?\d*)\s*([a-zA-Z]{3})\s*(?:to|in)\s*([a-zA-Z]{3})/i);
     if (!match) return null;
 
     const [, valueStr, fromCurrency, toCurrency] = match;
-    const value = parseFloat(valueStr);
+    // Remove commas before parsing
+    const value = parseFloat(valueStr.replace(/,/g, ''));
 
     if (isNaN(value)) return null;
 
@@ -465,7 +467,7 @@ const FloatingMenu = () => {
         onOpenChange={setShowCommandDialog}
       >
         <CommandInput
-          placeholder="Calculate or convert units..."
+          placeholder="Type command or calculate..."
           onExternalValueChange={handleInputChange}
           isCalculatorMode={isCalculatorMode}
           isConverterMode={isConverterMode}
@@ -476,6 +478,7 @@ const FloatingMenu = () => {
             {isCalculatorMode && calculationResult ? (
               <motion.div
                 className="px-3 -my-3 flex items-center gap-2"
+                key={calculationResult}
                 initial={{ scale: 1, filter: "blur(0px)" }}
                 animate={{
                   scale: [1, 1.05, 1],
@@ -504,6 +507,7 @@ const FloatingMenu = () => {
             ) : isConverterMode && conversionResult ? (
               <motion.div
                 className="px-3 -my-3 flex items-center gap-2"
+                key={conversionResult}
                 initial={{ scale: 1, filter: "blur(0px)" }}
                 animate={{
                   scale: [1, 1.05, 1],
@@ -532,6 +536,7 @@ const FloatingMenu = () => {
             ) : isCurrencyMode && currencyResult ? (
               <motion.div
                 className="px-3 -my-3 flex items-center gap-2"
+                key={currencyResult}
                 initial={{ scale: 1, filter: "blur(0px)" }}
                 animate={{
                   scale: [1, 1.05, 1],
@@ -581,21 +586,24 @@ const FloatingMenu = () => {
                 </span>
               </div>
             </CommandItem>
-            {/* Calculator Examples */}
-            <div className="px-2 py-1.5 text-[10px] text-muted-foreground border-b mb-2">
-              <div className="flex gap-2 items-center">
-                <span className="opacity-70">Examples:</span>
-                <div className="flex gap-2">
-                  <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
-                    2 + 2
-                  </span>
-                  <span className="opacity-50">·</span>
-                  <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
-                    15% of 80
-                  </span>
+
+            {/* Calculator Examples - Only show when no search input */}
+            {!inputValue && (
+              <div className="px-2 py-1.5 border-b mb-2">
+                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                  <span className="opacity-70">Examples:</span>
+                  <div className="flex gap-2">
+                    <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                      2 + 2
+                    </span>
+                    <span className="opacity-50">·</span>
+                    <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                      15% of 80
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Units Tool */}
             <CommandItem
@@ -613,21 +621,23 @@ const FloatingMenu = () => {
               </div>
             </CommandItem>
 
-            {/* Units Examples */}
-            <div className="px-2 py-1.5 text-[10px] text-muted-foreground border-b mb-2">
-              <div className="flex gap-2 items-center">
-                <span className="opacity-70">Examples:</span>
-                <div className="flex gap-2">
-                  <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
-                    5km to miles
-                  </span>
-                  <span className="opacity-50">·</span>
-                  <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
-                    100f to c
-                  </span>
+            {/* Units Examples - Only show when no search input */}
+            {!inputValue && (
+              <div className="px-2 py-1.5 border-b mb-2">
+                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                  <span className="opacity-70">Examples:</span>
+                  <div className="flex gap-2">
+                    <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                      5km to miles
+                    </span>
+                    <span className="opacity-50">·</span>
+                    <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                      100f to c
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Currency Tool */}
             <CommandItem
@@ -645,21 +655,23 @@ const FloatingMenu = () => {
               </div>
             </CommandItem>
 
-            {/* Currency Examples */}
-            <div className="px-2 py-1.5 text-[10px] text-muted-foreground">
-              <div className="flex gap-2 items-center">
-                <span className="opacity-70">Examples:</span>
-                <div className="flex gap-2">
-                  <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
-                    100 usd to eur
-                  </span>
-                  <span className="opacity-50">·</span>
-                  <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
-                    1000 jpy to usd
-                  </span>
+            {/* Currency Examples - Only show when no search input */}
+            {!inputValue && (
+              <div className="px-2 py-1.5">
+                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                  <span className="opacity-70">Examples:</span>
+                  <div className="flex gap-2">
+                    <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                      1,000 usd to eur
+                    </span>
+                    <span className="opacity-50">·</span>
+                    <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                      1,000,000 jpy to usd
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
           </CommandGroup>
         </CommandList>
       </CommandDialog>

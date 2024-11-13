@@ -43,6 +43,11 @@ const Command = React.forwardRef<
             "flex h-full w-full flex-col overflow-hidden rounded-md bg-popover text-popover-foreground",
             className
         )}
+        shouldFilter={false}
+        filter={(value, search) => {
+            if (!search) return 1
+            return value.toLowerCase().includes(search.toLowerCase()) ? 1 : 0
+        }}
         {...props}
     />
 ))
@@ -56,6 +61,12 @@ interface CommandDialogProps {
 
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
     const dialogRef = React.useRef<HTMLDivElement>(null);
+
+    // Add this function to detect mobile devices
+    const isMobile = () => {
+        if (typeof window === 'undefined') return false;
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    };
 
     // Handle ESC key
     React.useEffect(() => {
@@ -126,7 +137,10 @@ const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
                                             delay: 0.2
                                         }}
                                     >
-                                        <Command className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
+                                        <Command
+                                            className="[&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-muted-foreground [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5"
+                                            shouldFilter={!isMobile()}
+                                        >
                                             {children}
                                         </Command>
                                     </motion.div>
@@ -150,10 +164,14 @@ const CommandInput = React.forwardRef<
         value?: string;
     }
 >(({ className, isCalculatorMode, isConverterMode, onExternalValueChange, value, ...props }, ref) => {
-    // Add this function to detect mobile devices
-    const isMobile = () => {
-        if (typeof window === 'undefined') return false;
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const [wasCleared, setWasCleared] = React.useState(false);
+
+    const handleValueChange = (newValue: string) => {
+        if (newValue === '') {
+            setWasCleared(true);
+            setTimeout(() => setWasCleared(false), 0);
+        }
+        onExternalValueChange?.(newValue);
     };
 
     return (
@@ -172,8 +190,7 @@ const CommandInput = React.forwardRef<
                     "flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed disabled:opacity-50 pr-12",
                     className
                 )}
-                onValueChange={onExternalValueChange}
-                autoFocus={!isMobile()} // Only autofocus on non-mobile devices
+                onValueChange={handleValueChange}
                 {...props}
             />
             <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground opacity-60">
@@ -246,7 +263,37 @@ const CommandItem = React.forwardRef<
             className
         )}
         {...props}
-    />
+    >
+        <motion.div
+            variants={{
+                hidden: {
+                    opacity: 0,
+                    x: -20,
+                    scale: 0.95,
+                    filter: "blur(10px)"
+                },
+                show: {
+                    opacity: 1,
+                    x: 0,
+                    scale: 1,
+                    filter: "blur(0px)",
+                    transition: {
+                        type: "spring",
+                        stiffness: 80, // Reduced for smoother motion
+                        damping: 16, // Increased damping for slower movement
+                        mass: 1.2, // Slightly increased mass
+                        duration: 1.5, // Longer duration
+                        velocity: 0.3 // Added lower velocity for smoother motion
+                    }
+                }
+            }}
+            initial="hidden"
+            animate="show"
+            className="flex w-full items-center gap-3"
+        >
+            {props.children}
+        </motion.div>
+    </CommandPrimitive.Item>
 ))
 CommandItem.displayName = CommandPrimitive.Item.displayName
 
