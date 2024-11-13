@@ -51,17 +51,17 @@ export const HeroSection = ({
     }
   ]
 }: HeroSectionProps) => {
-  // Enhanced image variants with elastic and blur effects
+  // Enhanced image variants with elastic, blur, and grayscale effects
   const imageVariants = {
     initial: {
       opacity: 0,
       scale: 0.1,
-      filter: "blur(20px)",
+      filter: "blur(20px) grayscale(100%)",
     },
     animate: {
       opacity: 1,
       scale: 1,
-      filter: "blur(0px)",
+      filter: "blur(0px) grayscale(100%)",
       transition: {
         duration: 1.2,
         ease: [0.34, 1.56, 0.64, 1],
@@ -80,14 +80,14 @@ export const HeroSection = ({
       }
     },
     hover: {
-      filter: "blur(3px)",
+      filter: "blur(3px) grayscale(0%)",
       transition: {
         duration: 0.3,
         ease: "easeOut"
       }
     },
     tap: {
-      filter: "blur(3px)",
+      filter: "blur(3px) grayscale(0%)",
       scale: 0.95,
       transition: {
         duration: 0.3,
@@ -164,7 +164,7 @@ export const HeroSection = ({
             <img
               src={profileImage}
               alt="Profile memoji"
-              className="w-full h-full object-cover transition-all duration-200 prevent-drag select-none touch-none"
+              className="w-full h-full object-cover transition-all duration-200 prevent-drag select-none touch-none grayscale"
               style={{
                 transform: 'translateZ(0)',
                 backfaceVisibility: 'hidden',

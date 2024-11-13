@@ -566,7 +566,7 @@ const FloatingMenu = () => {
             )}
           </CommandEmpty>
           <CommandGroup heading="Tools">
-            {/* Update Calculator Tool */}
+            {/* Calculator Tool */}
             <CommandItem
               onSelect={handleCalculatorExample}
               className="cursor-none flex items-center gap-2"
@@ -593,15 +593,11 @@ const FloatingMenu = () => {
                   <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
                     15% of 80
                   </span>
-                  <span className="opacity-50">·</span>
-                  <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
-                    5 × 3
-                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Update Converter Tool */}
+            {/* Units Tool */}
             <CommandItem
               onSelect={handleConverterExample}
               className="cursor-none flex items-center gap-2"
@@ -610,14 +606,15 @@ const FloatingMenu = () => {
                 <ArrowLeftRight className="h-4 w-4" />
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-sm">Convert Units</span>
+                <span className="text-sm">Units</span>
                 <span className="text-xs text-muted-foreground">
                   Length, weight, and temperature
                 </span>
               </div>
             </CommandItem>
-            {/* Converter Examples */}
-            <div className="px-2 py-1.5 text-[10px] text-muted-foreground">
+
+            {/* Units Examples */}
+            <div className="px-2 py-1.5 text-[10px] text-muted-foreground border-b mb-2">
               <div className="flex gap-2 items-center">
                 <span className="opacity-70">Examples:</span>
                 <div className="flex gap-2">
@@ -628,15 +625,11 @@ const FloatingMenu = () => {
                   <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
                     100f to c
                   </span>
-                  <span className="opacity-50">·</span>
-                  <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
-                    2kg to lbs
-                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Currency Converter Tool */}
+            {/* Currency Tool */}
             <CommandItem
               onSelect={handleCurrencyExample}
               className="cursor-none flex items-center gap-2"
@@ -645,12 +638,13 @@ const FloatingMenu = () => {
                 <DollarSign className="h-4 w-4" />
               </div>
               <div className="flex flex-col gap-1">
-                <span className="text-sm">Convert Currency</span>
+                <span className="text-sm">Currency</span>
                 <span className="text-xs text-muted-foreground">
                   Real-time exchange rates
                 </span>
               </div>
             </CommandItem>
+
             {/* Currency Examples */}
             <div className="px-2 py-1.5 text-[10px] text-muted-foreground">
               <div className="flex gap-2 items-center">
@@ -658,10 +652,6 @@ const FloatingMenu = () => {
                 <div className="flex gap-2">
                   <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
                     100 usd to eur
-                  </span>
-                  <span className="opacity-50">·</span>
-                  <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
-                    50 eur to gbp
                   </span>
                   <span className="opacity-50">·</span>
                   <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
@@ -755,7 +745,7 @@ const FloatingMenu = () => {
                           }
                         }}
                       >
-                        <Tooltip>
+                        <Tooltip delayDuration={0}>
                           <TooltipTrigger asChild>
                             <Button
                               variant="ghost"
@@ -784,7 +774,7 @@ const FloatingMenu = () => {
                           </TooltipTrigger>
                           <TooltipContent
                             side="top"
-                            className="bg-background/80 backdrop-blur-md border-border/50 cursor-none"
+                            className="bg-background/80 backdrop-blur-md border-border/50 cursor-none hidden sm:block"
                             sideOffset={5}
                           >
                             <span className="font-medium">{item.label}</span>
@@ -822,7 +812,7 @@ const FloatingMenu = () => {
                     </TooltipTrigger>
                     <TooltipContent
                       side="top"
-                      className="bg-background/80 backdrop-blur-md border-border/50"
+                      className="bg-background/80 backdrop-blur-md border-border/50 hidden sm:block"
                     >
                       <span className="font-medium">Menu</span>
                     </TooltipContent>

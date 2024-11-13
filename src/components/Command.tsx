@@ -150,6 +150,12 @@ const CommandInput = React.forwardRef<
         value?: string;
     }
 >(({ className, isCalculatorMode, isConverterMode, onExternalValueChange, value, ...props }, ref) => {
+    // Add this function to detect mobile devices
+    const isMobile = () => {
+        if (typeof window === 'undefined') return false;
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    };
+
     return (
         <div className="flex items-center border-b px-3 relative" cmdk-input-wrapper="">
             {isCalculatorMode ? (
@@ -167,6 +173,7 @@ const CommandInput = React.forwardRef<
                     className
                 )}
                 onValueChange={onExternalValueChange}
+                autoFocus={!isMobile()} // Only autofocus on non-mobile devices
                 {...props}
             />
             <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground opacity-60">
