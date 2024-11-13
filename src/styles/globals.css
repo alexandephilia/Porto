@@ -13,6 +13,22 @@
   animation: shine 3s linear infinite;
 }
 
+@keyframes gradient-rotate {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-gradient-rotate {
+  animation: gradient-rotate 3s ease infinite;
+} 
+
 /* Combined touch prevention classes - Modified to allow clicks */
 .prevent-drag {
   -webkit-user-drag: none !important;

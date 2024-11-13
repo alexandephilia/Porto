@@ -11,11 +11,11 @@ const Tooltip = ({ children, ...props }: React.ComponentProps<typeof TooltipPrim
   const triggerRef = React.useRef<HTMLButtonElement>(null);
 
   React.useEffect(() => {
-    const isTouchDevice = 'ontouchstart' in window || 
-      navigator.maxTouchPoints > 0 || 
+    const isTouchDevice = 'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0 ||
       // @ts-ignore
       navigator.msMaxTouchPoints > 0;
-    
+
     setIsTouch(isTouchDevice);
 
     // Handle clicks outside to close tooltip on mobile

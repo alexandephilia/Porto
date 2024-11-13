@@ -12,6 +12,7 @@ import { SystemStatus } from "./SystemStatus";
 
 interface NavSectionProps extends NavSectionType {
   index: number;
+  titleStyle?: React.CSSProperties;
 }
 
 const springTransition = {
@@ -20,14 +21,17 @@ const springTransition = {
   stiffness: 300,
 };
 
-const NavSection = ({ title, links, index }: NavSectionProps) => (
+const NavSection = ({ title, links, index, titleStyle }: NavSectionProps) => (
   <motion.div
     className="flex-1 flex flex-col"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.1 * index, ...springTransition }}
   >
-    <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2 text-center">
+    <h3
+      className="text-sm uppercase tracking-wider text-muted-foreground mb-2 text-center"
+      style={titleStyle}
+    >
       {title}
     </h3>
     <div className="flex-1 flex flex-col justify-evenly">

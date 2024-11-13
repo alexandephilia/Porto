@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/ui/statusbadge";
 import { SiCardano } from "react-icons/si";
 import { motion } from "framer-motion"; // Add this import at the top
-import { Linkedin, Mail, User } from "lucide-react";
+import { Linkedin, Mail, User, Skull } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
@@ -12,6 +12,7 @@ import {
 import { useCallback } from 'react'; // Add this import
 import { Separator } from "@/components/ui/separator";
 import { ShimmerDot } from "@/components/ui/shimmer-dot";
+import { Skeleton } from "../ui/skeleton";
 
 interface SocialLink {
   href: string;
@@ -126,7 +127,16 @@ export const HeroSection = ({
         </div>
 
         <div className="relative">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-zinc-800 to-zinc-800 dark:from-[#f97316] dark:via-[#654127] dark:to-[#0ea5e9] rounded-full blur opacity-75 will-change-transform"></div>
+          <div
+            className="absolute -inset-[2px] rounded-full animate-gradient-rotate"
+            style={{
+              background: 'linear-gradient(90deg, #3f3f46, #71717a, #3f3f46)',
+              backgroundSize: '200% 200%',
+              filter: 'blur(4px)',
+              maskImage: 'radial-gradient(circle at center, transparent 65%, black 70%)',
+              WebkitMaskImage: 'radial-gradient(circle at center, transparent 65%, black 70%)',
+            }}
+          />
           <motion.div
             className="relative w-28 h-28 overflow-hidden rounded-full composite-layer touch-none select-none"
             variants={imageVariants}
@@ -199,7 +209,7 @@ export const HeroSection = ({
 
           <div className="w-96 mx-auto flex items-center gap-4">
             <Separator className="flex-1" />
-            <div className="w-2 h-2 rounded-full bg-foreground/20" />
+            <Skull className="w-4 h-4 text-foreground/20" />
             <Separator className="flex-1" />
           </div>
 
