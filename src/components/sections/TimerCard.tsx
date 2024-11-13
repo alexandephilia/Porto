@@ -2,6 +2,7 @@ import { Card } from "@/components/ui/card";
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { MapPin, Moon, Loader2, Globe2, Calendar, Clock } from "lucide-react";
+import { CSSProperties } from 'react';
 
 interface LocationData {
     city: string;
@@ -362,7 +363,7 @@ export const TimerCard = () => {
             ref={cardRef}
             style={{
                 filter: blurValue,
-                position: 'relative'
+                position: 'relative' as CSSProperties['position'],
             }}
             initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
             whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
@@ -397,28 +398,27 @@ export const TimerCard = () => {
                 <div className="flex justify-between items-center mb-6">
                     <div className="flex items-center gap-2">
                         {loading ? (
-                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-                                <Loader2 className="h-4 w-4 animate-spin" />
-                                <span className="text-sm">Detecting location...</span>
+                            <div className="flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+                                <Loader2 className="h-3 w-3 sm:h-4 sm:w-4 animate-spin" />
+                                <span className="text-[10px] sm:text-sm">Detecting location...</span>
                             </div>
                         ) : (
-                            <div className="flex flex-col gap-1">
-                                <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
-                                    <MapPin className="h-4 w-4 mu" />
-                                    <span className="text-sm font-medium">
+                            <div className="flex flex-col gap-0.5 sm:gap-1">
+                                <div className="flex items-center gap-1.5 sm:gap-2 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10">
+                                    <MapPin className="h-2.5 w-2.5 sm:h-4 sm:w-4" />
+                                    <span className="text-[10px] sm:text-sm font-medium">
                                         {city}, {country}
                                     </span>
                                     {temp !== undefined && (
-                                        <span className="text-sm text-muted-foreground">
+                                        <span className="text-[10px] sm:text-sm text-muted-foreground">
                                             {temp}°C
                                         </span>
                                     )}
                                 </div>
-                                <div className="flex items-center gap-1 ml-3">
-                                    <span className="text-[10px] text-muted-foreground/60">
+                                <div className="flex items-center gap-1 ml-2 sm:ml-3">
+                                    <span className="text-[7px] sm:text-[10px] text-muted-foreground/60">
                                         {timezone}
                                     </span>
-                                    {/* <Globe2 className="h-3.5 w-3.5 text-muted-foreground/60" /> */}
                                 </div>
                             </div>
                         )}
