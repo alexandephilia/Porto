@@ -25,15 +25,12 @@ const springTransition = {
 
 const NavSection = ({ title, links, index }: NavSectionProps) => (
   <motion.div 
-    className="flex flex-col gap-6"
+    className="flex flex-col gap-2"
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.1 * index, ...springTransition }}
   >
-    <h4 className="text-lg font-bold leading-none text-foreground text-center tracking-tight">
-      {title}
-    </h4>
-    <div className="flex flex-col space-y-4">
+    <div className="flex flex-col space-y-2">
       {links.map((link, idx) => (
         <motion.div
           key={link.href}
@@ -48,23 +45,13 @@ const NavSection = ({ title, links, index }: NavSectionProps) => (
         >
           <Button
             variant="ghost"
-            className="w-full justify-center group relative overflow-hidden rounded-lg h-12 transition-all duration-300 hover:bg-transparent"
+            className="w-full text-center rounded-none h-16 transition-all duration-300 hover:bg-transparent"
             asChild
           >
             <a href={link.href} className="relative">
-              <span className="relative z-10 flex items-center gap-3 text-base">
-                {link.icon && (
-                  <motion.div
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ delay: 0.2 * idx, ...springTransition }}
-                  >
-                    <link.icon className="h-5 w-5" />
-                  </motion.div>
-                )}
-                <span>{link.label}</span>
+              <span className="relative z-10 text-[28px] font-medium tracking-tight">
+                {link.label}
               </span>
-              <ExternalLink className="h-4 w-4 opacity-0 group-hover:opacity-50 transition-opacity absolute right-3 top-1/2 -translate-y-1/2" />
             </a>
           </Button>
         </motion.div>
@@ -91,7 +78,7 @@ const SocialLinks = () => (
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full transition-all duration-300 backdrop-blur-sm h-12 w-12 hover:bg-transparent hover:blur-[2px]"
+            className="rounded-full transition-all duration-300 backdrop-blur-sm bg-black/20 border-none h-12 w-12 hover:bg-black/30 hover:blur-[2px]"
             asChild
           >
             <a 
@@ -156,24 +143,7 @@ export const MobileNav = () => {
               transition={{ type: "spring", stiffness: 300, damping: 15, duration: 0.5 }}
               className="h-full p-6"
             >
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ 
-                  opacity: 1, 
-                  y: 0,
-                  transition: {
-                    delay: 0.2,
-                    duration: 0.4
-                  }
-                }}
-              >
-                <SheetHeader className="mb-8 mt-8">
-                  <SheetTitle className="text-xl font-bold tracking-tight text-center">
-                    Navigation
-                  </SheetTitle>
-                </SheetHeader>
-              </motion.div>
-              <div className="flex flex-col gap-8 pb-8 px-2">
+              <div className="flex flex-col gap-4 pt-12 px-2">
                 {navSections.map((section, index) => (
                   <NavSection key={section.title} {...section} index={index} />
                 ))}

@@ -80,7 +80,7 @@ export const AnimatedTyping = ({ words, className = "" }: AnimatedTypingProps) =
             style={{
               display: 'inline-block',
               willChange: "transform, opacity, filter",
-              backfaceVisibility: "hidden",
+              backfaceVisibility: "hidden" as const,
               transform: "translateZ(0)",
             }}
           >
@@ -102,8 +102,9 @@ export const AnimatedTyping = ({ words, className = "" }: AnimatedTypingProps) =
         className="inline-block ml-[1px] w-[2px] h-[1.2em] bg-current align-middle"
         style={{
           willChange: "opacity",
-          backfaceVisibility: "hidden",
+          backfaceVisibility: "hidden" as const,
           transform: "translateZ(0)",
+          boxShadow: "0 0 8px rgba(255, 255, 255, 0.7), 0 0 12px rgba(255, 255, 255, 0.5)"
         }}
       />
     </div>

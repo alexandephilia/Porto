@@ -443,14 +443,14 @@ export const TimerCard = () => {
                 <div className="flex justify-center items-center mb-6">
                     <div className="flex flex-col items-center">
                         <div className="flex items-baseline gap-2">
-                            <span className="text-4xl sm:text-5xl font-mono font-bold tracking-wider">
+                            <span className="text-5xl sm:text-6xl font-mono font-bold tracking-wider">
                                 {formatTime(currentTime).time}
                             </span>
-                            <span className="text-sm sm:text-base font-mono text-muted-foreground">
+                            <span className="text-base sm:text-lg font-mono text-muted-foreground">
                                 {formatTime(currentTime).period}
                             </span>
                         </div>
-                        <span className="text-xs text-muted-foreground/60 mt-2">
+                        <span className="text-sm text-muted-foreground/60 mt-2">
                             local time
                         </span>
                     </div>

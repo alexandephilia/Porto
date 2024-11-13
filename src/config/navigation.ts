@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail, User, Briefcase, Phone, Globe, Code, Server, Palette, Layout } from "lucide-react";
+import { Github, Linkedin, Mail } from "lucide-react";
 
 export interface NavLink {
   href: string;
@@ -14,22 +14,30 @@ export interface NavSection {
 
 export const navSections: NavSection[] = [
   {
-    title: "About",
+    title: "Main",
     links: [
-      { href: "/about", label: "About Me", icon: User, description: "Learn more about my background" },
-      { href: "/experience", label: "Experience", icon: Briefcase, description: "My professional journey" },
-      { href: "/contact", label: "Contact", icon: Phone, description: "Get in touch" },
+      {
+        label: "About",
+        href: "/about",
+      },
+      {
+        label: "Projects",
+        href: "/projects",
+      },
+      {
+        label: "Experience",
+        href: "/experience",
+      },
+      {
+        label: "Skills",
+        href: "/skills",
+      },
+      {
+        label: "Contact",
+        href: "/contact",
+      },
     ],
   },
-  {
-    title: "Projects",
-    links: [
-      { href: "/projects/web", label: "Web Development", icon: Globe, description: "Modern web applications" },
-      { href: "/projects/mobile", label: "Mobile Development", icon: Layout, description: "Cross-platform apps" },
-      { href: "/projects/backend", label: "Backend Development", icon: Server, description: "Scalable solutions" },
-    ],
-  },
-  
 ];
 
 export const socialLinks = [

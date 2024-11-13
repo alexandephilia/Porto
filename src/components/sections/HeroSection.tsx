@@ -27,6 +27,37 @@ interface HeroSectionProps {
   socialLinks?: SocialLink[];
 }
 
+// Add these type definitions at the top of the file
+type CustomMotionDivStyle = {
+  transform: string;
+  backfaceVisibility: BackfaceVisibility;
+  WebkitBackfaceVisibility: BackfaceVisibility;
+  willChange: string;
+  contain?: string;
+  cursor: string;
+  WebkitTapHighlightColor: string;
+  touchAction: TouchAction;
+  userSelect: UserSelect;
+  WebkitUserSelect: UserSelect;
+  WebkitTouchCallout: 'none' | 'default';
+};
+
+type CustomImageStyle = {
+  transform: string;
+  backfaceVisibility: 'hidden' | 'visible';
+  WebkitBackfaceVisibility: 'hidden' | 'visible';
+  willChange: string;
+  WebkitTouchCallout: 'none';
+  WebkitUserSelect: 'none';
+  userSelect: 'none';
+  pointerEvents: 'none';
+  touchAction: 'none';
+} & React.CSSProperties;
+
+type BackfaceVisibility = 'visible' | 'hidden';
+type TouchAction = 'none' | 'auto' | 'manipulation';
+type UserSelect = 'none' | 'text' | 'all' | 'auto';
+
 export const HeroSection = ({
   name,
   title,
@@ -149,7 +180,7 @@ export const HeroSection = ({
               userSelect: 'none',
               WebkitUserSelect: 'none',
               WebkitTouchCallout: 'none'
-            }}
+            } as CustomMotionDivStyle}
           >
             <img
               src={profileImage}
@@ -165,7 +196,7 @@ export const HeroSection = ({
                 userSelect: 'none',
                 pointerEvents: 'none',
                 touchAction: 'none'
-              }}
+              } as CustomImageStyle}
               draggable={false}
               onContextMenu={preventTouchActions}
               onTouchStart={preventTouchActions}
