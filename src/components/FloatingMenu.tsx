@@ -1,7 +1,7 @@
 // Import necessary dependencies for animations, UI components, and icons
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { Home, User, Award, Terminal, Mail, Menu, X, Hash, Calculator, ArrowLeftRight } from "lucide-react";
+import { Home, User, Award, Terminal, Mail, Menu, X, Hash, Calculator, ArrowLeftRight, DollarSign, Send, Phone, Handshake, MessageCircle, MessagesSquare, UserRoundPlus, MailCheck, Option } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -18,6 +18,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/Command";
+import { SiMaildotru, SiThreads } from "react-icons/si";
 
 type UnitCategory = 'length' | 'weight' | 'temperature';
 
@@ -136,6 +137,40 @@ const converterExamples = [
   "1000g to oz"
 ];
 
+type CurrencyCategory = 'currency';
+
+interface CurrencyConversion {
+  from: string;
+  to: string;
+  rate?: number;
+}
+
+const currencyExamples = [
+  "100 usd to eur",
+  "50 eur to gbp",
+  "1000 jpy to usd",
+  "25 gbp to eur",
+  "75 aud to usd",
+  "500 cad to eur",
+  "1000000 idr to usd",
+  "100 usd to idr",
+  "500000 idr to eur"
+];
+
+// Add this function to fetch exchange rates
+const fetchExchangeRate = async (from: string, to: string): Promise<number | null> => {
+  try {
+    const response = await fetch(
+      `https://open.er-api.com/v6/latest/${from.toUpperCase()}`
+    );
+    const data = await response.json();
+    return data.rates[to.toUpperCase()] || null;
+  } catch (error) {
+    console.error('Error fetching exchange rate:', error);
+    return null;
+  }
+};
+
 const FloatingMenu = () => {
   // State management for menu open/close and animation states
   const [isOpen, setIsOpen] = useState(false);
@@ -147,6 +182,8 @@ const FloatingMenu = () => {
   const [isConverterMode, setIsConverterMode] = useState(false);
   const [conversionResult, setConversionResult] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
+  const [isCurrencyMode, setIsCurrencyMode] = useState(false);
+  const [currencyResult, setCurrencyResult] = useState<string | null>(null);
 
   // Handle menu close animation sequence
   const handleClose = async () => {
@@ -221,23 +258,24 @@ const FloatingMenu = () => {
       onClick: () => setShowCommandDialog(true),
       command: true
     },
+
+    {
+      icon: <UserRoundPlus className="h-5 w-5" />,
+      label: "WhatsApp",
+      href: "https://wa.me/6285959300787",
+      external: true
+    },
+    {
+      icon: <MailCheck className="h-5 w-5" />,
+      label: "Email",
+      href: "mailto:0xnihilist@gmail.com",
+      external: true
+    },
     {
       icon: <Hash className="h-5 w-5" />,
       label: "Twitter",
       href: "https://x.com/0xnihilism",
       external: true
-    },
-    {
-      icon: <User className="h-5 w-5" />,
-      label: "About",
-      href: "#about",
-      external: false
-    },
-    {
-      icon: <Mail className="h-5 w-5" />,
-      label: "Contact",
-      href: "#contact",
-      external: false
     },
     {
       icon: <X className="h-5 w-5" />,
@@ -250,8 +288,8 @@ const FloatingMenu = () => {
   const mobileWidth = menuItems.length * 48 + 16;
   const desktopWidth = menuItems.length * 44;
 
-  // Add this helper function at the top of your component
-  const formatResult = (result: number, isUnitConversion = false): string => {
+  // Update the formatResult function
+  const formatResult = (result: number, isUnitConversion = false, isCurrency = false): string => {
     if (!Number.isFinite(result)) return null;
 
     // Handle very small or very large numbers
@@ -259,21 +297,36 @@ const FloatingMenu = () => {
       return result.toExponential(2);
     }
 
+    // For currency formatting
+    if (isCurrency) {
+      // Format with commas and 3 decimal places
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 3,
+        maximumFractionDigits: 3,
+      }).format(result);
+    }
+
     // For regular numbers
     if (Number.isInteger(result)) {
-      return String(result);
+      return new Intl.NumberFormat('en-US').format(result);
     }
 
     // Different precision for unit conversions vs calculations
     if (isUnitConversion) {
       // Use 3 decimal places for unit conversions
       const fixedResult = result.toFixed(3);
-      // Remove trailing zeros but keep at least 3 decimal places
-      return fixedResult.replace(/\.?0+$/, '');
+      // Format with commas and remove trailing zeros
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 3,
+      }).format(parseFloat(fixedResult));
     } else {
       // For calculations, use 2 decimal places
       const fixedResult = result.toFixed(2);
-      return fixedResult.endsWith('0') ? fixedResult : fixedResult.replace(/\.?0+$/, '');
+      return new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2,
+      }).format(parseFloat(fixedResult));
     }
   };
 
@@ -312,29 +365,44 @@ const FloatingMenu = () => {
     if (!value.trim()) {
       setIsConverterMode(false);
       setIsCalculatorMode(false);
+      setIsCurrencyMode(false);
       setCalculationResult(null);
       setConversionResult(null);
+      setCurrencyResult(null);
       return;
     }
 
-    // More lenient conversion pattern
-    const conversionPattern = /(\d+\.?\d*)\s*([a-zA-Z]+)\s*(?:to|in)\s*([a-zA-Z]+)/i;
-    const isConversion = conversionPattern.test(value);
+    // Check for currency pattern first
+    const currencyPattern = /(\d+\.?\d*)\s*([a-zA-Z]{3})\s*(?:to|in)\s*([a-zA-Z]{3})/i;
+    const isCurrency = currencyPattern.test(value);
 
-    if (isConversion) {
-      setIsConverterMode(true);
+    if (isCurrency) {
+      setIsCurrencyMode(true);
+      setIsConverterMode(false);
       setIsCalculatorMode(false);
-      const result = handleUnitConversion(value);
-      setConversionResult(result);
       setCalculationResult(null);
+      setConversionResult(null);
+      handleCurrencyConversion(value);
     } else {
-      // Check if it contains any math operators or numbers
-      const hasCalculation = /[\d+\-*×x÷/().%]|of/i.test(value);
-      if (hasCalculation) {
-        setIsConverterMode(false);
-        setIsCalculatorMode(true);
-        setConversionResult(null);
-        calculateResult(value.replace(/\s+/g, '')); // Remove spacing restrictions
+      // More lenient conversion pattern
+      const conversionPattern = /(\d+\.?\d*)\s*([a-zA-Z]+)\s*(?:to|in)\s*([a-zA-Z]+)/i;
+      const isConversion = conversionPattern.test(value);
+
+      if (isConversion) {
+        setIsConverterMode(true);
+        setIsCalculatorMode(false);
+        const result = handleUnitConversion(value);
+        setConversionResult(result);
+        setCalculationResult(null);
+      } else {
+        // Check if it contains any math operators or numbers
+        const hasCalculation = /[\d+\-*×x÷/().%]|of/i.test(value);
+        if (hasCalculation) {
+          setIsConverterMode(false);
+          setIsCalculatorMode(true);
+          setConversionResult(null);
+          calculateResult(value.replace(/\s+/g, '')); // Remove spacing restrictions
+        }
       }
     }
   };
@@ -357,6 +425,36 @@ const FloatingMenu = () => {
     setCalculationResult(null);
     const result = handleUnitConversion(example);
     setConversionResult(result);
+  };
+
+  const handleCurrencyExample = () => {
+    const example = currencyExamples[Math.floor(Math.random() * currencyExamples.length)];
+    setInputValue(example);
+    setIsCurrencyMode(true);
+    setIsCalculatorMode(false);
+    setIsConverterMode(false);
+    setCalculationResult(null);
+    setConversionResult(null);
+    handleCurrencyConversion(example);
+  };
+
+  // Update the handleCurrencyConversion function
+  const handleCurrencyConversion = async (input: string) => {
+    const match = input.match(/(\d+\.?\d*)\s*([a-zA-Z]{3})\s*(?:to|in)\s*([a-zA-Z]{3})/i);
+    if (!match) return null;
+
+    const [, valueStr, fromCurrency, toCurrency] = match;
+    const value = parseFloat(valueStr);
+
+    if (isNaN(value)) return null;
+
+    const rate = await fetchExchangeRate(fromCurrency, toCurrency);
+    if (rate) {
+      const result = value * rate;
+      setCurrencyResult(`${formatResult(result, false, true)} ${toCurrency.toUpperCase()}`);
+    } else {
+      setCurrencyResult(null);
+    }
   };
 
   return (
@@ -395,8 +493,11 @@ const FloatingMenu = () => {
                   }
                 }}
               >
-                <Calculator className="h-4 w-4 text-orange-500/50" />
-                <span className="text-orange-500 font-bold text-base drop-shadow-[0_0_15px_rgba(249,115,22,0.6)] tracking-wide">
+                <Calculator className="h-4 w-4 text-orange-500 animate-pulse" />
+                <span className="text-orange-500 font-bold text-base tracking-wider animate-pulse 
+                  [text-shadow:0_0_1px_theme(colors.orange.500),0_0_15px_theme(colors.orange.500/40),0_0_30px_theme(colors.orange.500/20)] 
+                  [-webkit-text-stroke:0.25px_theme(colors.orange.600/30)]
+                  [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
                   = {calculationResult}
                 </span>
               </motion.div>
@@ -420,13 +521,44 @@ const FloatingMenu = () => {
                   }
                 }}
               >
-                <ArrowLeftRight className="h-4 w-4 text-blue-500/50" />
-                <span className="text-blue-500 font-bold text-base drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] tracking-wide">
+                <ArrowLeftRight className="h-4 w-4 text-blue-500 animate-pulse" />
+                <span className="text-blue-500 font-bold text-base tracking-wider animate-pulse
+                  [text-shadow:0_0_1px_theme(colors.blue.500),0_0_15px_theme(colors.blue.500/40),0_0_30px_theme(colors.blue.500/20)]
+                  [-webkit-text-stroke:0.25px_theme(colors.blue.600/30)]
+                  [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
                   = {conversionResult}
                 </span>
               </motion.div>
+            ) : isCurrencyMode && currencyResult ? (
+              <motion.div
+                className="px-3 -my-3 flex items-center gap-2"
+                initial={{ scale: 1, filter: "blur(0px)" }}
+                animate={{
+                  scale: [1, 1.05, 1],
+                  filter: ["blur(0px)", "blur(2px)", "blur(0px)"]
+                }}
+                transition={{
+                  duration: 0.5,
+                  times: [0, 0.5, 1],
+                  scale: {
+                    ease: [0.22, 1, 0.36, 1],
+                  },
+                  filter: {
+                    ease: "easeInOut",
+                    delay: 0.1
+                  }
+                }}
+              >
+                <DollarSign className="h-4 w-4 text-green-500 animate-pulse" />
+                <span className="text-green-500 font-bold text-base tracking-wider animate-pulse
+                  [text-shadow:0_0_1px_theme(colors.green.500),0_0_15px_theme(colors.green.500/40),0_0_30px_theme(colors.green.500/20)]
+                  [-webkit-text-stroke:0.25px_theme(colors.green.600/30)]
+                  [filter:brightness(1.2)_contrast(1.1)_blur(0.2px)]">
+                  = {currencyResult}
+                </span>
+              </motion.div>
             ) : (
-              !isCalculatorMode && !isConverterMode && (
+              !isCalculatorMode && !isConverterMode && !isCurrencyMode && (
                 <div className="py-6 text-center text-sm">
                   No results found.
                 </div>
@@ -450,15 +582,21 @@ const FloatingMenu = () => {
               </div>
             </CommandItem>
             {/* Calculator Examples */}
-            <div className="px-2 py-1.5 text-xs text-muted-foreground border-b mb-2">
+            <div className="px-2 py-1.5 text-[10px] text-muted-foreground border-b mb-2">
               <div className="flex gap-2 items-center">
                 <span className="opacity-70">Examples:</span>
                 <div className="flex gap-2">
-                  <span className="text-orange-500/70">2 + 2</span>
+                  <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                    2 + 2
+                  </span>
                   <span className="opacity-50">·</span>
-                  <span className="text-orange-500/70">15% of 80</span>
+                  <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                    15% of 80
+                  </span>
                   <span className="opacity-50">·</span>
-                  <span className="text-orange-500/70">5 × 3</span>
+                  <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                    5 × 3
+                  </span>
                 </div>
               </div>
             </div>
@@ -479,15 +617,56 @@ const FloatingMenu = () => {
               </div>
             </CommandItem>
             {/* Converter Examples */}
-            <div className="px-2 py-1.5 text-xs text-muted-foreground">
+            <div className="px-2 py-1.5 text-[10px] text-muted-foreground">
               <div className="flex gap-2 items-center">
                 <span className="opacity-70">Examples:</span>
                 <div className="flex gap-2">
-                  <span className="text-blue-500/70">5km to miles</span>
+                  <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                    5km to miles
+                  </span>
                   <span className="opacity-50">·</span>
-                  <span className="text-blue-500/70">100f to c</span>
+                  <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                    100f to c
+                  </span>
                   <span className="opacity-50">·</span>
-                  <span className="text-blue-500/70">2kg to lbs</span>
+                  <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                    2kg to lbs
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Currency Converter Tool */}
+            <CommandItem
+              onSelect={handleCurrencyExample}
+              className="cursor-none flex items-center gap-2"
+            >
+              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
+                <DollarSign className="h-4 w-4" />
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-sm">Convert Currency</span>
+                <span className="text-xs text-muted-foreground">
+                  Real-time exchange rates
+                </span>
+              </div>
+            </CommandItem>
+            {/* Currency Examples */}
+            <div className="px-2 py-1.5 text-[10px] text-muted-foreground">
+              <div className="flex gap-2 items-center">
+                <span className="opacity-70">Examples:</span>
+                <div className="flex gap-2">
+                  <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                    100 usd to eur
+                  </span>
+                  <span className="opacity-50">·</span>
+                  <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                    50 eur to gbp
+                  </span>
+                  <span className="opacity-50">·</span>
+                  <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                    1000 jpy to usd
+                  </span>
                 </div>
               </div>
             </div>

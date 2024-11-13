@@ -102,7 +102,10 @@ export const ProjectsSection = () => {
         filter: blurFilter
       }}
     >
-      <h2 className="text-3xl font-bold mb-12">Existence Kits</h2>
+      <div className="space-y-2 mb-8">
+        <h2 className="text-3xl font-bold">Existence Kits</h2>
+        <p className="text-muted-foreground">Some tools to help this life less absurd</p>
+      </div>
       <motion.div
         variants={containerVariants}
         initial="hidden"

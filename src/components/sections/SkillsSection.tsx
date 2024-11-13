@@ -69,18 +69,18 @@ interface Skill {
 }
 
 // SkillCard component to display individual skills
-const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }> = ({ 
-  title, 
-  description, 
-  proficiency, 
+const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }> = ({
+  title,
+  description,
+  proficiency,
   tools,
   detailedDescription,
   keyFeatures,
   isExpanded,
-  onToggle 
+  onToggle
 }) => {
   return (
-    <Card 
+    <Card
       className="group hover:shadow-lg transition-all duration-500 cursor-pointer min-h-[400px] flex flex-col"
       onClick={onToggle}
     >
@@ -91,7 +91,7 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
             {/* Progress bar showing skill proficiency */}
             <div className="mt-2 flex items-center gap-2">
               <div className="h-2 w-48 bg-muted rounded-full overflow-hidden">
-                <motion.div 
+                <motion.div
                   className="h-full bg-primary"
                   initial={{ width: 0 }}
                   animate={{ width: `${proficiency}%` }}
@@ -106,7 +106,7 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
       <CardContent className="space-y-4 flex-grow">
         {/* Updated description text styling for consistency */}
         <p className="text-sm text-muted-foreground h-[72px] line-clamp-3">{description}</p>
-        
+
         {/* Tools and technologies section */}
         <div className="space-y-3">
           <h4 className="text-sm font-medium">Tools & Technologies</h4>
@@ -134,19 +134,19 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
           <AnimatePresence mode="sync">
             {isExpanded && (
               <motion.div
-                initial={{ 
+                initial={{
                   height: 0,
                   opacity: 0,
                   y: -20,
                   filter: "blur(10px)"
                 }}
-                animate={{ 
+                animate={{
                   height: "auto",
                   opacity: 1,
                   y: 0,
                   filter: "blur(0px)"
                 }}
-                exit={{ 
+                exit={{
                   height: 0,
                   opacity: 0,
                   y: -20,
@@ -160,7 +160,7 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
               >
                 {/* Detailed description section */}
                 {detailedDescription && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
                     animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                     transition={{ delay: 0.5, duration: 0.7 }}
@@ -170,10 +170,10 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
                     <p className="text-sm text-muted-foreground">{detailedDescription}</p>
                   </motion.div>
                 )}
-                
+
                 {/* Key features section */}
                 {keyFeatures && keyFeatures.length > 0 && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
                     animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                     transition={{ delay: 0.4, duration: 0.5 }}
@@ -189,7 +189,7 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
                 )}
 
                 {/* Tool proficiency section */}
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   transition={{ delay: 0.5, duration: 0.5 }}
@@ -202,7 +202,7 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
                         key={index}
                         initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                        transition={{ 
+                        transition={{
                           delay: 0.5 + index * 0.15,
                           duration: 0.5
                         }}
@@ -213,8 +213,8 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
                           <span className="text-sm font-medium">{tool.name}</span>
                         </div>
                         {tool.level && (
-                          <Badge 
-                            variant="secondary" 
+                          <Badge
+                            variant="secondary"
                             className="mt-1 text-xs font-normal hover:blur-[2px] transition-all duration-300 bg-muted-foreground/10"
                           >
                             {tool.level}
@@ -241,7 +241,7 @@ export const SkillsSection: React.FC = () => {
   // State to track expanded skills
   const [expandedSkills, setExpandedSkills] = useState<Set<string>>(new Set());
   const sectionRef = useRef<HTMLElement>(null);
-  
+
   // Setup scroll-based animations
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -345,7 +345,7 @@ export const SkillsSection: React.FC = () => {
   ];
 
   return (
-    <motion.section 
+    <motion.section
       ref={sectionRef}
       className="container py-12 space-y-8"
       style={{
@@ -356,11 +356,11 @@ export const SkillsSection: React.FC = () => {
       {/* Section header */}
       <div className="space-y-2">
         <h2 className="text-3xl font-bold tracking-tight">Skills & Expertise</h2>
-        <p className="text-muted-foreground">Technologies and tools I work with</p>
+        <p className="text-muted-foreground">Technologies and tools I work to find meaning</p>
       </div>
 
       {/* Main skills grid */}
-      <motion.div 
+      <motion.div
         className="grid md:grid-cols-2 gap-6"
         variants={{
           hidden: { opacity: 0 },
@@ -379,13 +379,13 @@ export const SkillsSection: React.FC = () => {
           <motion.div
             key={index}
             variants={{
-              hidden: { 
-                opacity: 0, 
+              hidden: {
+                opacity: 0,
                 y: 30,
                 filter: "blur(10px)",
               },
-              show: { 
-                opacity: 1, 
+              show: {
+                opacity: 1,
                 y: 0,
                 filter: "blur(0px)",
                 transition: {
@@ -395,8 +395,8 @@ export const SkillsSection: React.FC = () => {
               }
             }}
           >
-            <SkillCard 
-              {...skill} 
+            <SkillCard
+              {...skill}
               isExpanded={expandedSkills.has(skill.title)}
               onToggle={() => toggleSkill(skill.title)}
             />
@@ -406,7 +406,7 @@ export const SkillsSection: React.FC = () => {
       {/* Additional Skills Grid */}
       <div className="mt-12">
         <h3 className="text-xl font-semibold mb-6">Additional Technologies</h3>
-        <motion.div 
+        <motion.div
           className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8"
           variants={{
             hidden: { opacity: 0 },
@@ -423,16 +423,16 @@ export const SkillsSection: React.FC = () => {
           viewport={{ once: true, margin: "-50px" }}
         >
           {additionalSkills.map((skill, index) => (
-            <motion.div 
+            <motion.div
               key={index}
               variants={{
-                hidden: { 
-                  opacity: 0, 
+                hidden: {
+                  opacity: 0,
                   y: 20,
                   filter: "blur(10px)"
                 },
-                show: { 
-                  opacity: 1, 
+                show: {
+                  opacity: 1,
                   y: 0,
                   filter: "blur(0px)",
                   transition: {
@@ -449,8 +449,8 @@ export const SkillsSection: React.FC = () => {
                   </div>
                   <div className="flex-1 flex flex-col items-center justify-center gap-1.5">
                     <p className="text-xs font-medium sm:text-sm">{skill.name}</p>
-                    <Badge 
-                      variant="secondary" 
+                    <Badge
+                      variant="secondary"
                       className="text-[10px] font-normal bg-muted-foreground/10 px-2 py-0"
                     >
                       {skill.level}
