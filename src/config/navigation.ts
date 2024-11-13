@@ -22,11 +22,11 @@ export const navSections: NavSection[] = [
     ],
   },
   {
-    title: "Projects",
+    title: "Hobbies",
     links: [
-      { href: "/projects/web", label: "Web Development", icon: Globe, description: "Modern web applications" },
-      { href: "/projects/mobile", label: "Mobile Development", icon: Layout, description: "Cross-platform apps" },
-      { href: "/projects/backend", label: "Backend Development", icon: Server, description: "Scalable solutions" },
+      { href: "/projects/ai", label: "AI Research", icon: Code, description: "Exploring artificial intelligence" },
+      { href: "/projects/components", label: "Web Components", icon: Globe, description: "Building reusable UI components" },
+      { href: "/projects/prompts", label: "Prompt Engineering", icon: Palette, description: "Crafting effective AI prompts" },
     ],
   },
   

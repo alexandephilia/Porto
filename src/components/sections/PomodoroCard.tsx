@@ -3,6 +3,7 @@ import React, { useEffect, useRef, useState, Fragment } from "react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Play, Pause, RotateCcw, Coffee, Brain, Sun, Mountain, Rocket, Moon } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { CSSProperties } from 'react';
 
 type TimerMode = 'work' | 'break';
 
@@ -90,7 +91,7 @@ const AnimatedNumber = ({ number }: { number: string }) => {
                     }}
                     className="absolute inset-0 flex items-center justify-center"
                     style={{
-                        backfaceVisibility: 'hidden',
+                        backfaceVisibility: 'hidden' as CSSProperties['backfaceVisibility'],
                         transform: 'translateZ(0)',
                     }}
                 >
@@ -226,39 +227,39 @@ export const PomodoroCard = () => {
                             className="absolute top-6 right-6 max-w-[200px]"
                         >
                             <div
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-full backdrop-blur-[2px] shadow-sm transition-all duration-300"
+                                className="flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full backdrop-blur-[2px] shadow-sm transition-all duration-300"
                                 style={{
                                     background: `linear-gradient(135deg, ${JSON.parse(taskColor).primary}, ${JSON.parse(taskColor).complementary})`,
                                     border: `1px solid ${JSON.parse(taskColor).border}`,
                                     boxShadow: `0 2px 10px ${JSON.parse(taskColor).complementary}`,
                                 }}
                             >
-                                <p className="text-sm font-medium">{currentTask}</p>
+                                <p className="text-[10px] sm:text-sm font-medium">{currentTask}</p>
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
                 <div className="flex justify-between items-center mb-6">
-                    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors
+                    <div className={`flex items-center gap-1.5 px-2 sm:px-3 py-1 sm:py-1.5 rounded-full transition-colors
                         ${mode === 'work' ? timeTheme.colors.bg : 'bg-black/5 dark:bg-white/5'}
                         ${mode === 'work' ? timeTheme.colors.border : 'border-black/10 dark:border-white/10'}
                         border`}
                     >
                         {mode === 'work' ? (
                             <>
-                                {timeTheme.icon === 'sun' && <Sun className={`h-4 w-4 ${timeTheme.colors.iconColor}`} />}
-                                {timeTheme.icon === 'mountain' && <Mountain className={`h-4 w-4 ${timeTheme.colors.iconColor}`} />}
-                                {timeTheme.icon === 'rocket' && <Rocket className={`h-4 w-4 ${timeTheme.colors.iconColor}`} />}
-                                {timeTheme.icon === 'moon' && <Moon className={`h-4 w-4 ${timeTheme.colors.iconColor}`} />}
-                                <span className={`text-sm font-medium ${timeTheme.colors.text}`}>
+                                {timeTheme.icon === 'sun' && <Sun className={`h-3 w-3 sm:h-4 sm:w-4 ${timeTheme.colors.iconColor}`} />}
+                                {timeTheme.icon === 'mountain' && <Mountain className={`h-3 w-3 sm:h-4 sm:w-4 ${timeTheme.colors.iconColor}`} />}
+                                {timeTheme.icon === 'rocket' && <Rocket className={`h-3 w-3 sm:h-4 sm:w-4 ${timeTheme.colors.iconColor}`} />}
+                                {timeTheme.icon === 'moon' && <Moon className={`h-3 w-3 sm:h-4 sm:w-4 ${timeTheme.colors.iconColor}`} />}
+                                <span className={`text-[10px] sm:text-sm font-medium ${timeTheme.colors.text}`}>
                                     {timeTheme.text}
                                 </span>
                             </>
                         ) : (
                             <>
-                                <Coffee className="h-4 w-4" />
-                                <span className="text-sm font-medium">Break Time</span>
+                                <Coffee className="h-3 w-3 sm:h-4 sm:w-4" />
+                                <span className="text-[10px] sm:text-sm font-medium">Break Time</span>
                             </>
                         )}
                     </div>
