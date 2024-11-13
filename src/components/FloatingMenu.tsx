@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import {
+  Command,
   CommandDialog,
   CommandEmpty,
   CommandGroup,
@@ -358,7 +359,7 @@ const FloatingMenu = () => {
     }
   };
 
-  // Update the input handler to check for both calculator and converter modes
+  // Update the input handler
   const handleInputChange = (value: string) => {
     setInputValue(value);
 
@@ -391,16 +392,20 @@ const FloatingMenu = () => {
       if (isConversion) {
         setIsConverterMode(true);
         setIsCalculatorMode(false);
+        setIsCurrencyMode(false);
         const result = handleUnitConversion(value);
         setConversionResult(result);
         setCalculationResult(null);
+        setCurrencyResult(null);
       } else {
         // Check if it contains any math operators or numbers
         const hasCalculation = /[\d+\-*×x÷/().%]|of/i.test(value);
         if (hasCalculation) {
           setIsConverterMode(false);
           setIsCalculatorMode(true);
+          setIsCurrencyMode(false);
           setConversionResult(null);
+          setCurrencyResult(null);
           calculateResult(value.replace(/\s+/g, '')); // Remove spacing restrictions
         }
       }
