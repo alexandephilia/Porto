@@ -191,6 +191,10 @@ const CommandInput = React.forwardRef<
                     className
                 )}
                 onValueChange={handleValueChange}
+                autoComplete="off"
+                autoCorrect="off"
+                spellCheck="false"
+                data-lpignore="true"
                 {...props}
             />
             <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground opacity-60">
