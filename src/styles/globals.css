@@ -45,7 +45,7 @@
   -webkit-tap-highlight-color: transparent !important;
 }
 
-/* Global touch prevention - Modified to allow clicks */
+
 :root {
   -webkit-tap-highlight-color: transparent;
 }
