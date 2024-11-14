@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Command as CommandPrimitive } from "cmdk"
-import { Terminal, Calculator, ArrowLeftRight } from "lucide-react"
+import { Terminal, Calculator, ArrowLeftRight, DollarSign } from "lucide-react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { cn } from "@/lib/utils"
 import { motion, AnimatePresence } from "framer-motion"
@@ -118,15 +118,18 @@ const CommandInput = React.forwardRef<
     React.ComponentPropsWithoutRef<typeof CommandPrimitive.Input> & {
         isCalculatorMode?: boolean;
         isConverterMode?: boolean;
+        isCurrencyMode?: boolean;
         onExternalValueChange?: (value: string) => void;
         value?: string;
     }
->(({ className, isCalculatorMode, isConverterMode, onExternalValueChange, value, ...props }, ref) => (
+>(({ className, isCalculatorMode, isConverterMode, isCurrencyMode, onExternalValueChange, value, ...props }, ref) => (
     <div className="flex items-center border-b px-3 relative" cmdk-input-wrapper="">
         {isCalculatorMode ? (
             <Calculator className="mr-2 h-4 w-4 shrink-0 opacity-50" />
         ) : isConverterMode ? (
             <ArrowLeftRight className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+        ) : isCurrencyMode ? (
+            <DollarSign className="mr-2 h-4 w-4 shrink-0 opacity-50" />
         ) : (
             <Terminal className="mr-2 h-4 w-4 shrink-0 opacity-50" />
         )}

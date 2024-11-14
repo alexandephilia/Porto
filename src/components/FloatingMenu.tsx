@@ -358,7 +358,7 @@ const FloatingMenu = () => {
     }
   };
 
-  // Update the input handler to check for both calculator and converter modes
+  // Update the input handler to properly set currency mode
   const handleInputChange = (value: string) => {
     setInputValue(value);
 
@@ -377,14 +377,21 @@ const FloatingMenu = () => {
     const isCurrency = currencyPattern.test(value);
 
     if (isCurrency) {
-      setIsCurrencyMode(true);
-      setIsConverterMode(false);
+      // Reset other modes first
       setIsCalculatorMode(false);
+      setIsConverterMode(false);
       setCalculationResult(null);
       setConversionResult(null);
+
+      // Set currency mode and handle conversion
+      setIsCurrencyMode(true);
       handleCurrencyConversion(value);
     } else {
-      // More lenient conversion pattern
+      // Reset currency mode
+      setIsCurrencyMode(false);
+      setCurrencyResult(null);
+
+      // Check for unit conversion
       const conversionPattern = /(\d+\.?\d*)\s*([a-zA-Z]+)\s*(?:to|in)\s*([a-zA-Z]+)/i;
       const isConversion = conversionPattern.test(value);
 
@@ -395,13 +402,13 @@ const FloatingMenu = () => {
         setConversionResult(result);
         setCalculationResult(null);
       } else {
-        // Check if it contains any math operators or numbers
+        // Check for calculator input
         const hasCalculation = /[\d+\-*×x÷/().%]|of/i.test(value);
         if (hasCalculation) {
           setIsConverterMode(false);
           setIsCalculatorMode(true);
           setConversionResult(null);
-          calculateResult(value.replace(/\s+/g, '')); // Remove spacing restrictions
+          calculateResult(value.replace(/\s+/g, ''));
         }
       }
     }
@@ -483,6 +490,7 @@ const FloatingMenu = () => {
           onExternalValueChange={handleInputChange}
           isCalculatorMode={isCalculatorMode}
           isConverterMode={isConverterMode}
+          isCurrencyMode={isCurrencyMode}
           value={inputValue}
           autoFocus={false}
           readOnly={true}
@@ -592,107 +600,109 @@ const FloatingMenu = () => {
             )}
           </CommandEmpty>
           <CommandGroup heading="Tools">
-            {/* Calculator Tool */}
-            <CommandItem
-              onSelect={handleCalculatorExample}
-              className="cursor-none flex items-center gap-2"
-            >
-              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
-                <Calculator className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm">Calculate</span>
-                <span className="text-xs text-muted-foreground">
-                  Basic math and percentage calculations
-                </span>
-              </div>
-            </CommandItem>
+            <div className="flex flex-col">
+              {/* Calculator Tool - Always first */}
+              <CommandItem
+                onSelect={handleCalculatorExample}
+                className="cursor-none flex items-center gap-2 order-1"
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
+                  <Calculator className="h-4 w-4" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm">Calculate</span>
+                  <span className="text-xs text-muted-foreground">
+                    Basic math and percentage calculations
+                  </span>
+                </div>
+              </CommandItem>
 
-            {/* Calculator Examples - Only show when no search input */}
-            {!inputValue && (
-              <div className="px-2 py-1.5 border-b mb-2">
-                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
-                  <span className="opacity-70">Examples:</span>
-                  <div className="flex gap-2">
-                    <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
-                      2 + 2
-                    </span>
-                    <span className="opacity-50">·</span>
-                    <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
-                      15% of 80
-                    </span>
+              {/* Calculator Examples */}
+              {!inputValue && (
+                <div className="px-2 py-1.5 border-b mb-2 order-2">
+                  <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                    <span className="opacity-70">Examples:</span>
+                    <div className="flex gap-2">
+                      <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                        2 + 2
+                      </span>
+                      <span className="opacity-50">·</span>
+                      <span className="text-orange-500 [text-shadow:0_0_1px_theme(colors.orange.500),0_0_10px_theme(colors.orange.500/30)] blur-[0.2px] font-medium">
+                        15% of 80
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Units Tool */}
-            <CommandItem
-              onSelect={handleConverterExample}
-              className="cursor-none flex items-center gap-2"
-            >
-              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
-                <ArrowLeftRight className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm">Units</span>
-                <span className="text-xs text-muted-foreground">
-                  Length, weight, and temperature
-                </span>
-              </div>
-            </CommandItem>
+              {/* Units Tool - Always second */}
+              <CommandItem
+                onSelect={handleConverterExample}
+                className="cursor-none flex items-center gap-2 order-3"
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
+                  <ArrowLeftRight className="h-4 w-4" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm">Units</span>
+                  <span className="text-xs text-muted-foreground">
+                    Length, weight, and temperature
+                  </span>
+                </div>
+              </CommandItem>
 
-            {/* Units Examples - Only show when no search input */}
-            {!inputValue && (
-              <div className="px-2 py-1.5 border-b mb-2">
-                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
-                  <span className="opacity-70">Examples:</span>
-                  <div className="flex gap-2">
-                    <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
-                      5km to miles
-                    </span>
-                    <span className="opacity-50">·</span>
-                    <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
-                      100f to c
-                    </span>
+              {/* Units Examples */}
+              {!inputValue && (
+                <div className="px-2 py-1.5 border-b mb-2 order-4">
+                  <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                    <span className="opacity-70">Examples:</span>
+                    <div className="flex gap-2">
+                      <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                        5km to miles
+                      </span>
+                      <span className="opacity-50">·</span>
+                      <span className="text-blue-500 [text-shadow:0_0_1px_theme(colors.blue.500),0_0_10px_theme(colors.blue.500/30)] blur-[0.2px] font-medium">
+                        100f to c
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
 
-            {/* Currency Tool */}
-            <CommandItem
-              onSelect={handleCurrencyExample}
-              className="cursor-none flex items-center gap-2"
-            >
-              <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
-                <DollarSign className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col gap-1">
-                <span className="text-sm">Currency</span>
-                <span className="text-xs text-muted-foreground">
-                  Real-time exchange rates
-                </span>
-              </div>
-            </CommandItem>
+              {/* Currency Tool - Always third */}
+              <CommandItem
+                onSelect={handleCurrencyExample}
+                className="cursor-none flex items-center gap-2 order-5"
+              >
+                <div className="flex h-6 w-6 items-center justify-center rounded-md border border-border/40">
+                  <DollarSign className="h-4 w-4" />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <span className="text-sm">Currency</span>
+                  <span className="text-xs text-muted-foreground">
+                    Real-time exchange rates
+                  </span>
+                </div>
+              </CommandItem>
 
-            {/* Currency Examples - Only show when no search input */}
-            {!inputValue && (
-              <div className="px-2 py-1.5">
-                <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
-                  <span className="opacity-70">Examples:</span>
-                  <div className="flex gap-2">
-                    <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
-                      1,000 usd to eur
-                    </span>
-                    <span className="opacity-50">·</span>
-                    <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
-                      1,000,000 jpy to usd
-                    </span>
+              {/* Currency Examples */}
+              {!inputValue && (
+                <div className="px-2 py-1.5 order-6">
+                  <div className="flex gap-2 items-center text-[10px] text-muted-foreground">
+                    <span className="opacity-70">Examples:</span>
+                    <div className="flex gap-2">
+                      <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                        1,000 usd to eur
+                      </span>
+                      <span className="opacity-50">·</span>
+                      <span className="text-green-500 [text-shadow:0_0_1px_theme(colors.green.500),0_0_10px_theme(colors.green.500/30)] blur-[0.2px] font-medium">
+                        1,000,000 jpy to usd
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </CommandGroup>
         </CommandList>
       </CommandDialog>
