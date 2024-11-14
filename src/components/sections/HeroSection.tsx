@@ -107,13 +107,13 @@ export const HeroSection = ({
         <div className="w-full h-full border-b-[1px] border-dashed border-foreground/10" />
       </div>
 
-      <section className="container min-h-[70vh] pt-24 md:pt-32 pb-12 relative flex flex-col items-center justify-between border-l-[1px] border-r-[1px] border-dashed border-foreground/20">
-        {/* <ShimmerDot
+      <section className="container min-h-[70vh] pt-24 md:pt-32 pb-12 relative flex flex-col items-center justify-between border-l-[1px] border-r-[1px] border-dashed border-foreground/10">
+        <ShimmerDot
           shapeType="Square"
           size={2.5}
           gap={8}
           speed={0.7}
-        /> */}
+        />
 
         {/* Keep the gradient overlays */}
         <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent opacity-90" />
