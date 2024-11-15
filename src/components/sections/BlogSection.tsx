@@ -70,6 +70,13 @@ const itemVariants = {
   }
 };
 
+// Add this function at the top of the component
+const scrollToTop = (element: HTMLElement) => {
+  if (element) {
+    element.scrollTop = 0;
+  }
+};
+
 const BlogSection = () => {
   // Updated posts data with new fields
   const posts: Post[] = [
@@ -283,6 +290,29 @@ const BlogSection = () => {
     return () => document.removeEventListener('keydown', handleEscape);
   }, [handleEscape]);
 
+  // Add this useEffect to handle scroll locking
+  useEffect(() => {
+    if (selectedPost) {
+      // Store current scroll position
+      const scrollY = window.scrollY;
+
+      // Add styles to prevent body scroll while maintaining position
+      document.body.style.position = 'fixed';
+      document.body.style.top = `-${scrollY}px`;
+      document.body.style.width = '100%';
+      document.body.style.overflowY = 'hidden';
+
+      return () => {
+        // Remove styles and restore scroll position when modal closes
+        document.body.style.position = '';
+        document.body.style.top = '';
+        document.body.style.width = '';
+        document.body.style.overflowY = '';
+        window.scrollTo(0, scrollY);
+      };
+    }
+  }, [selectedPost]);
+
   return (
     <motion.section
       ref={sectionRef}
@@ -424,7 +454,7 @@ const BlogSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-[60]"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-start sm:items-center justify-center p-0 sm:p-4 z-[60] overflow-y-auto overscroll-none touch-none"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setSelectedPost(null);
@@ -434,22 +464,56 @@ const BlogSection = () => {
             <FocusScope contain restoreFocus autoFocus>
               <motion.div
                 ref={(el) => {
-                  modalRef.current = el;
-                  initialFocusRef.current = el;
+                  if (el) {
+                    modalRef.current = el;
+                    initialFocusRef.current = el;
+                    // Ensure modal content starts from top when opened
+                    scrollToTop(el);
+                  }
                 }}
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.9, opacity: 0 }}
+                initial={{ scale: 0.95, opacity: 0, y: 20 }}
+                animate={{ scale: 1, opacity: 1, y: 0 }}
+                exit={{ scale: 0.95, opacity: 0, y: 20 }}
                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                className="bg-card text-card-foreground rounded-lg shadow-lg overflow-hidden max-w-3xl w-full max-h-[80vh] flex flex-col focus:outline-none"
+                className="bg-card text-card-foreground rounded-lg shadow-lg overflow-y-auto w-full sm:max-w-3xl 
+                  min-h-screen sm:min-h-0 sm:max-h-[80vh] flex flex-col focus:outline-none 
+                  relative mt-0 sm:mt-4"
                 tabIndex={-1}
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="modal-title"
+                onAnimationComplete={() => {
+                  // Ensure modal is scrolled to top after animation
+                  if (modalRef.current) {
+                    scrollToTop(modalRef.current);
+                  }
+                }}
               >
-                {/* Modal Content */}
+                {/* Modal Header - Make it sticky */}
                 <motion.div
-                  className="p-4 sm:p-6 overflow-y-auto flex-grow"
+                  variants={itemVariants}
+                  className="sticky top-0 z-10 bg-card border-b border-border px-4 py-3 sm:px-6 sm:py-4
+                    flex justify-between items-center"
+                >
+                  <h2
+                    id="modal-title"
+                    className="text-xl sm:text-2xl font-bold tracking-tight line-clamp-1"
+                  >
+                    {selectedPost.title}
+                  </h2>
+                  <button
+                    onClick={() => setSelectedPost(null)}
+                    className="text-muted-foreground hover:text-foreground focus:outline-none 
+                      focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm p-1 ml-2"
+                    aria-label="Close modal"
+                  >
+                    <X className="h-4 w-4 sm:h-5 sm:w-5" />
+                  </button>
+                </motion.div>
+
+                {/* Modal Content - Update padding and spacing */}
+                <motion.div
+                  className="p-4 sm:p-6 flex-grow"
                   variants={containerVariants}
                   initial="hidden"
                   animate="visible"
