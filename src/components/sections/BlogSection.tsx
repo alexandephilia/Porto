@@ -415,9 +415,9 @@ const BlogSection = () => {
         {selectedPost && (
           <motion.div
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            animate={{ opacity: 1, backdropFilter: "blur(12px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[60]"
+            className="fixed inset-0 bg-black/75 sm:bg-black/90 flex items-center justify-center p-2 sm:p-4 z-[60]"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setSelectedPost(null);
@@ -431,7 +431,8 @@ const BlogSection = () => {
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
-                className="bg-card text-card-foreground rounded-lg shadow-lg overflow-hidden max-w-3xl w-full max-h-[80vh] flex flex-col focus:outline-none"
+                className="bg-card text-card-foreground rounded-lg shadow-lg overflow-hidden w-full max-w-3xl 
+                  max-h-[90vh] sm:max-h-[80vh] flex flex-col focus:outline-none m-2 sm:m-0"
                 tabIndex={-1}
                 role="dialog"
                 aria-modal="true"
