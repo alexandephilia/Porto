@@ -5,6 +5,8 @@ import { motion, useScroll, useTransform, AnimatePresence, MotionProps, useSprin
 import { useRef, useCallback, useState, useEffect } from "react";
 import { useAnimationOptimizer } from '@/hooks/useAnimationOptimizer';
 import { useOptimizedIntersection } from '@/hooks/useOptimizedIntersection';
+import { FocusScope } from '@react-aria/focus';
+import { useKeyboard } from '@react-aria/interactions';
 
 // Update the Post interface to match new data structure
 interface Post {
@@ -243,6 +245,44 @@ const BlogSection = () => {
     filteredPosts.filter((_, index) => index % columns === i)
   );
 
+  // Add these new refs and state
+  const initialFocusRef = useRef<HTMLDivElement>(null);
+  const lastActiveElement = useRef<HTMLElement | null>(null);
+
+  // Add focus management when modal opens/closes
+  useEffect(() => {
+    if (selectedPost) {
+      // Store the currently focused element
+      lastActiveElement.current = document.activeElement as HTMLElement;
+
+      // Focus the modal after it opens
+      requestAnimationFrame(() => {
+        initialFocusRef.current?.focus();
+      });
+
+      // Prevent body scroll
+      document.body.style.overflow = 'hidden';
+    } else {
+      // Restore focus when modal closes
+      lastActiveElement.current?.focus();
+
+      // Restore body scroll
+      document.body.style.overflow = 'unset';
+    }
+  }, [selectedPost]);
+
+  // Handle escape key
+  const handleEscape = useCallback((event: KeyboardEvent) => {
+    if (event.key === 'Escape' && selectedPost) {
+      setSelectedPost(null);
+    }
+  }, [selectedPost]);
+
+  useEffect(() => {
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [handleEscape]);
+
   return (
     <motion.section
       ref={sectionRef}
@@ -384,126 +424,146 @@ const BlogSection = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center p-4 z-[60]"
+            className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-[60]"
+            onClick={(e) => {
+              if (e.target === e.currentTarget) {
+                setSelectedPost(null);
+              }
+            }}
           >
-            <motion.div
-              ref={modalRef}
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-              transition={{ type: "spring", damping: 20, stiffness: 300 }}
-              className="bg-card text-card-foreground rounded-lg shadow-lg overflow-hidden max-w-3xl w-full max-h-[80vh] flex flex-col"
-            >
-              {/* Modal Content */}
+            <FocusScope contain restoreFocus autoFocus>
               <motion.div
-                className="p-4 sm:p-6 overflow-y-auto flex-grow"
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
+                ref={(el) => {
+                  modalRef.current = el;
+                  initialFocusRef.current = el;
+                }}
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                className="bg-card text-card-foreground rounded-lg shadow-lg overflow-hidden max-w-3xl w-full max-h-[80vh] flex flex-col focus:outline-none"
+                tabIndex={-1}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="modal-title"
               >
-                {/* Modal Header */}
+                {/* Modal Content */}
                 <motion.div
-                  variants={itemVariants}
-                  className="flex justify-between items-start mb-3 sm:mb-4"
+                  className="p-4 sm:p-6 overflow-y-auto flex-grow"
+                  variants={containerVariants}
+                  initial="hidden"
+                  animate="visible"
                 >
-                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight">{selectedPost.title}</h2>
-                  <button
-                    onClick={() => setSelectedPost(null)}
-                    className="text-muted-foreground hover:text-foreground focus:outline-none"
+                  {/* Modal Header */}
+                  <motion.div
+                    variants={itemVariants}
+                    className="flex justify-between items-start mb-3 sm:mb-4"
                   >
-                    <X className="h-4 w-4 sm:h-5 sm:w-5" />
-                  </button>
-                </motion.div>
-
-                {/* Post Metadata */}
-                <motion.div
-                  variants={containerVariants}
-                  className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6 text-[10px] sm:text-xs text-muted-foreground border-b border-border pb-2 sm:pb-3"
-                >
-                  {[
-                    { icon: <User className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />, text: selectedPost.author },
-                    { icon: <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />, text: selectedPost.date },
-                    { icon: <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />, text: selectedPost.readTime },
-                    { icon: <Tag className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />, text: selectedPost.category }
-                  ].map((item, index) => (
-                    <motion.div
-                      key={index}
-                      variants={itemVariants}
-                      className="flex items-center"
+                    <h2
+                      id="modal-title"
+                      className="text-xl sm:text-2xl font-bold tracking-tight"
                     >
-                      {item.icon}
-                      <span>{item.text}</span>
-                    </motion.div>
-                  ))}
-                </motion.div>
-
-                {/* Introduction */}
-                <motion.p
-                  variants={itemVariants}
-                  className="text-sm sm:text-base leading-relaxed text-muted-foreground mb-6"
-                >
-                  {selectedPost.content.introduction}
-                </motion.p>
-
-                {/* Content Sections */}
-                <motion.div variants={containerVariants}>
-                  {selectedPost.content.sections.map((section, sectionIndex) => (
-                    <motion.div
-                      key={sectionIndex}
-                      variants={containerVariants}
-                      className="space-y-2 sm:space-y-3 mb-6"
+                      {selectedPost.title}
+                    </h2>
+                    <button
+                      onClick={() => setSelectedPost(null)}
+                      className="text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 rounded-sm p-1"
+                      aria-label="Close modal"
                     >
-                      {section.heading && (
-                        <motion.h3
-                          variants={itemVariants}
-                          className="text-base sm:text-lg font-semibold tracking-tight mt-4 sm:mt-6 mb-2 sm:mb-3"
-                        >
-                          {section.heading}
-                        </motion.h3>
-                      )}
+                      <X className="h-4 w-4 sm:h-5 sm:w-5" />
+                    </button>
+                  </motion.div>
 
-                      {section.paragraphs.map((paragraph, pIndex) => (
-                        <motion.p
-                          key={pIndex}
-                          variants={itemVariants}
-                          className="text-xs sm:text-sm leading-relaxed"
-                        >
-                          {paragraph}
-                        </motion.p>
-                      ))}
+                  {/* Post Metadata */}
+                  <motion.div
+                    variants={containerVariants}
+                    className="flex flex-wrap items-center gap-2 sm:gap-3 mb-4 sm:mb-6 text-[10px] sm:text-xs text-muted-foreground border-b border-border pb-2 sm:pb-3"
+                  >
+                    {[
+                      { icon: <User className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />, text: selectedPost.author },
+                      { icon: <Calendar className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />, text: selectedPost.date },
+                      { icon: <Clock className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />, text: selectedPost.readTime },
+                      { icon: <Tag className="h-3 w-3 sm:h-3.5 sm:w-3.5 mr-1" />, text: selectedPost.category }
+                    ].map((item, index) => (
+                      <motion.div
+                        key={index}
+                        variants={itemVariants}
+                        className="flex items-center"
+                      >
+                        {item.icon}
+                        <span>{item.text}</span>
+                      </motion.div>
+                    ))}
+                  </motion.div>
 
-                      {section.quote && (
-                        <motion.blockquote
-                          variants={itemVariants}
-                          className="border-l-3 border-primary pl-4 sm:pl-6 my-6 sm:my-8 italic text-xs sm:text-sm relative mx-8 sm:mx-12 pr-4 sm:pr-6 max-w-[85%]"
-                        >
-                          <span className="absolute -left-1 -top-3 text-primary text-xl sm:text-2xl leading-none" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic' }}>"</span>
-                          <p className="px-2" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic' }}>{section.quote}</p>
-                          <span className="absolute text-primary text-xl sm:text-2xl leading-none" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic', right: '-4px', bottom: '-8px' }}>"</span>
-                        </motion.blockquote>
-                      )}
-                    </motion.div>
-                  ))}
-                </motion.div>
+                  {/* Introduction */}
+                  <motion.p
+                    variants={itemVariants}
+                    className="text-sm sm:text-base leading-relaxed text-muted-foreground mb-6"
+                  >
+                    {selectedPost.content.introduction}
+                  </motion.p>
 
-                {/* Tags */}
-                <motion.div
-                  variants={containerVariants}
-                  className="flex flex-wrap gap-1 sm:gap-1.5 pt-2 sm:pt-3 border-t border-border"
-                >
-                  {selectedPost.tags.map((tag, index) => (
-                    <motion.span
-                      key={tag}
-                      variants={itemVariants}
-                      className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium 
-                        bg-secondary/50 text-secondary-foreground hover:bg-secondary/70 transition-colors"
-                    >
-                      {tag}
-                    </motion.span>
-                  ))}
+                  {/* Content Sections */}
+                  <motion.div variants={containerVariants}>
+                    {selectedPost.content.sections.map((section, sectionIndex) => (
+                      <motion.div
+                        key={sectionIndex}
+                        variants={containerVariants}
+                        className="space-y-2 sm:space-y-3 mb-6"
+                      >
+                        {section.heading && (
+                          <motion.h3
+                            variants={itemVariants}
+                            className="text-base sm:text-lg font-semibold tracking-tight mt-4 sm:mt-6 mb-2 sm:mb-3"
+                          >
+                            {section.heading}
+                          </motion.h3>
+                        )}
+
+                        {section.paragraphs.map((paragraph, pIndex) => (
+                          <motion.p
+                            key={pIndex}
+                            variants={itemVariants}
+                            className="text-xs sm:text-sm leading-relaxed"
+                          >
+                            {paragraph}
+                          </motion.p>
+                        ))}
+
+                        {section.quote && (
+                          <motion.blockquote
+                            variants={itemVariants}
+                            className="border-l-3 border-primary pl-4 sm:pl-6 my-6 sm:my-8 italic text-xs sm:text-sm relative mx-8 sm:mx-12 pr-4 sm:pr-6 max-w-[85%]"
+                          >
+                            <span className="absolute -left-1 -top-3 text-primary text-xl sm:text-2xl leading-none" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic' }}>"</span>
+                            <p className="px-2" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic' }}>{section.quote}</p>
+                            <span className="absolute text-primary text-xl sm:text-2xl leading-none" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic', right: '-4px', bottom: '-8px' }}>"</span>
+                          </motion.blockquote>
+                        )}
+                      </motion.div>
+                    ))}
+                  </motion.div>
+
+                  {/* Tags */}
+                  <motion.div
+                    variants={containerVariants}
+                    className="flex flex-wrap gap-1 sm:gap-1.5 pt-2 sm:pt-3 border-t border-border"
+                  >
+                    {selectedPost.tags.map((tag, index) => (
+                      <motion.span
+                        key={tag}
+                        variants={itemVariants}
+                        className="inline-flex items-center px-1.5 sm:px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-medium 
+                          bg-secondary/50 text-secondary-foreground hover:bg-secondary/70 transition-colors"
+                      >
+                        {tag}
+                      </motion.span>
+                    ))}
+                  </motion.div>
                 </motion.div>
               </motion.div>
-            </motion.div>
+            </FocusScope>
           </motion.div>
         )}
       </AnimatePresence>
