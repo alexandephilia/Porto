@@ -281,7 +281,7 @@ const BlogSection = () => {
       ref={sectionRef}
       className="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto"
       style={{
-        filter: blurFilter,
+        filter: selectedPost ? "none" : blurFilter,
         willChange: "transform"
       }}
     >
@@ -415,7 +415,7 @@ const BlogSection = () => {
         {selectedPost && (
           <motion.div
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            animate={{ opacity: 1, backdropFilter: "blur(8px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(2px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
             className="fixed inset-0 bg-black/75 sm:bg-black/90 flex items-center justify-center p-2 sm:p-4 z-[60]"
             onClick={(e) => {
