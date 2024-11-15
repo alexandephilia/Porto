@@ -19,6 +19,10 @@ declare module 'framer-motion' {
     export type MotionComponent<P = {}> = React.ForwardRefExoticComponent<P & MotionProps & React.RefAttributes<any>>
 
     export const motion: {
+        h3: any
+        blockquote: any
+        span: any
+        p: any
         section: MotionComponent<React.HTMLAttributes<HTMLElement>>
         div: MotionComponent<React.HTMLAttributes<HTMLDivElement>>
         // Add other HTML elements as needed
