@@ -6,7 +6,6 @@ import { useRef, useCallback, useState, useEffect } from "react";
 import { useAnimationOptimizer } from '@/hooks/useAnimationOptimizer';
 import { useOptimizedIntersection } from '@/hooks/useOptimizedIntersection';
 import { FocusScope } from '@react-aria/focus';
-import { useKeyboard } from '@react-aria/interactions';
 
 // Update the Post interface to match new data structure
 interface Post {
@@ -259,15 +258,9 @@ const BlogSection = () => {
       requestAnimationFrame(() => {
         initialFocusRef.current?.focus();
       });
-
-      // Prevent body scroll
-      document.body.style.overflow = 'hidden';
     } else {
       // Restore focus when modal closes
       lastActiveElement.current?.focus();
-
-      // Restore body scroll
-      document.body.style.overflow = 'unset';
     }
   }, [selectedPost]);
 
@@ -292,14 +285,14 @@ const BlogSection = () => {
         willChange: "transform"
       }}
     >
-      <h2 className="text-3xl font-bold mb-8 text-center">Latest Articles</h2>
+      <h2 className="text-3xl font-bold mb-8 text-center">Latest Contemplations</h2>
 
       {/* Search and Filter Controls */}
       <div className="mb-8 flex flex-col sm:flex-row gap-4">
         <div className="relative flex-grow">
           <input
             type="text"
-            placeholder="Search articles..."
+            placeholder="Search contemplations..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full px-4 py-2 pl-10 rounded-md border border-input bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary"
@@ -421,10 +414,10 @@ const BlogSection = () => {
       <AnimatePresence>
         {selectedPost && (
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center p-4 z-[60]"
+            initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            animate={{ opacity: 1, backdropFilter: "blur(12px)" }}
+            exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
+            className="fixed inset-0 bg-black/90 backdrop-blur-lg flex items-center justify-center p-4 z-[60]"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setSelectedPost(null);
@@ -433,10 +426,7 @@ const BlogSection = () => {
           >
             <FocusScope contain restoreFocus autoFocus>
               <motion.div
-                ref={(el) => {
-                  modalRef.current = el;
-                  initialFocusRef.current = el;
-                }}
+                ref={modalRef}
                 initial={{ scale: 0.9, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 exit={{ scale: 0.9, opacity: 0 }}
@@ -534,11 +524,31 @@ const BlogSection = () => {
                         {section.quote && (
                           <motion.blockquote
                             variants={itemVariants}
-                            className="border-l-3 border-primary pl-4 sm:pl-6 my-6 sm:my-8 italic text-xs sm:text-sm relative mx-8 sm:mx-12 pr-4 sm:pr-6 max-w-[85%]"
+                            className="border-l-3 border-primary pl-4 sm:pl-6 my-12 sm:my-16 italic text-xs sm:text-sm relative mx-8 sm:mx-12 pr-4 sm:pr-6 max-w-[85%]"
                           >
-                            <span className="absolute -left-1 -top-3 text-primary text-xl sm:text-2xl leading-none" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic' }}>"</span>
-                            <p className="px-2" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic' }}>{section.quote}</p>
-                            <span className="absolute text-primary text-xl sm:text-2xl leading-none" style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic', right: '-4px', bottom: '-8px' }}>"</span>
+                            <span
+                              className="absolute -left-1 -top-1 text-primary text-xl sm:text-2xl leading-none"
+                              style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic' }}
+                            >
+                              "
+                            </span>
+                            <p
+                              className="px-2"
+                              style={{ fontFamily: '"Libre Bodoni", serif', fontStyle: 'italic' }}
+                            >
+                              {section.quote}
+                            </p>
+                            <span
+                              className="absolute text-primary text-xl sm:text-2xl leading-none"
+                              style={{
+                                fontFamily: '"Libre Bodoni", serif',
+                                fontStyle: 'italic',
+                                right: '10px',
+                                bottom: '-8px'
+                              }}
+                            >
+                              "
+                            </span>
                           </motion.blockquote>
                         )}
                       </motion.div>
