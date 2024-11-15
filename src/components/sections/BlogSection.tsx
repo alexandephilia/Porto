@@ -1,6 +1,6 @@
 // Import necessary packages and components
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Book, X, Calendar, Clock, Tag, User, Search } from "lucide-react";
+import { Book, X, Calendar, Clock, Tag, User, Search, Brain, Sparkles, Code, MessageCircle, Zap, Star, Coffee, BrainCircuit, Lightbulb } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence, MotionProps, useSpring } from "framer-motion";
 import { useRef, useCallback, useState, useEffect } from "react";
 import { useAnimationOptimizer } from '@/hooks/useAnimationOptimizer';
@@ -69,74 +69,256 @@ const itemVariants = {
   }
 };
 
+const InlineIcon = ({ children, animationType = 'default' }: {
+  children: React.ReactNode,
+  animationType?: 'default' | 'think' | 'spark' | 'pulse' | 'spin' | 'bounce' | 'float' | 'glitch' | 'wave'
+}) => {
+  // *(Creating a sick animation variants object)*
+  const animations = {
+    default: {
+      animate: {
+        opacity: [0.5, 1, 0.5],
+        scale: [1, 1.1, 1],
+        rotate: [0, 5, -5, 0]
+      },
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    },
+    think: {
+      animate: {
+        opacity: [0.5, 1, 0.5],
+        scale: [1, 1.1, 1],
+        y: [0, -3, 0],
+        rotate: [0, 5, -5, 0]
+      },
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    },
+    spark: {
+      animate: {
+        opacity: [0.6, 1, 0.6],
+        scale: [1, 1.2, 1],
+        rotate: [0, 15, -15, 0],
+        filter: ["brightness(1)", "brightness(1.3)", "brightness(1)"]
+      },
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    },
+    pulse: {
+      animate: {
+        opacity: [0.5, 1, 0.5],
+        scale: [1, 1.15, 1],
+        filter: ["brightness(1)", "brightness(1.2)", "brightness(1)"]
+      },
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    },
+    spin: {
+      animate: {
+        opacity: [0.5, 1, 0.5],
+        rotate: [0, 180, 360],
+        scale: [1, 1.1, 1]
+      },
+      transition: {
+        duration: 3,
+        repeat: Infinity,
+        ease: "linear"
+      }
+    },
+    bounce: {
+      animate: {
+        opacity: [0.5, 1, 0.5],
+        y: [0, -4, 0],
+        scale: [1, 1.1, 1]
+      },
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    },
+    float: {
+      animate: {
+        opacity: [0.5, 1, 0.5],
+        y: [0, -3, 0],
+        x: [-2, 2, -2],
+        rotate: [-5, 5, -5]
+      },
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    },
+    glitch: {
+      animate: {
+        opacity: [0.5, 1, 0.5],
+        x: [-1, 1, -1],
+        y: [1, -1, 1],
+        scale: [1, 1.05, 1]
+      },
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    },
+    wave: {
+      animate: {
+        opacity: [0.5, 1, 0.5],
+        rotate: [0, 10, -10, 0],
+        scale: [1, 1.1, 1]
+      },
+      transition: {
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut"
+      }
+    }
+  };
+
+  const selectedAnimation = animations[animationType];
+
+  return (
+    <motion.span
+      className="inline-flex items-center justify-center ml-1 mr-[0px] text-primary"
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={selectedAnimation.animate}
+      transition={selectedAnimation.transition}
+      style={{
+        verticalAlign: 'middle',
+        display: 'inline-flex',
+        height: '1em',
+        width: '1em',
+        position: 'relative',
+        top: '-2px'
+      }}
+    >
+      {children}
+    </motion.span>
+  );
+};
+
+const addInlineIcons = (text: string) => {
+  const iconMap = {
+    'nihilism': <Brain size={14} />,
+    'universe': <Sparkles size={14} />,
+    'realtime': <MessageCircle size={14} />,
+    'code': <Code size={14} />,
+    'think': <Lightbulb size={14} />,
+    'energy': <Zap size={14} />,
+    'magic': <Star size={14} />,
+    'coffee': <Coffee size={14} />
+  };
+
+  const pattern = new RegExp(`(\\b${Object.keys(iconMap).join('\\b|\\b')}\\b)`, 'gi');
+
+  return text.split(pattern).map((part, index) => {
+    const lowercasePart = part.toLowerCase();
+    const iconConfig = iconMap[lowercasePart as keyof typeof iconMap];
+
+    return iconConfig
+      ? <span key={index}>
+        {part}
+        <InlineIcon animationType={
+          lowercasePart === 'think' ? 'think' :
+            lowercasePart === 'energy' ? 'spark' :
+              lowercasePart === 'magic' ? 'pulse' :
+                lowercasePart === 'coffee' ? 'spin' :
+                  lowercasePart === 'nihilism' ? 'bounce' :
+                    lowercasePart === 'universe' ? 'float' :
+                      lowercasePart === 'realtime' ? 'glitch' :
+                        lowercasePart === 'code' ? 'wave' : 'default'
+        }>
+          {iconConfig}
+        </InlineIcon>
+      </span>
+      : part;
+  });
+};
+
 const BlogSection = () => {
   // Updated posts data with new fields
   const posts: Post[] = [
     {
-      title: "Understanding Modern Web Development",
-      preview: "Exploring the latest trends and best practices...",
+      title: "Nihilism & Coding: Embracing the Void",
+      preview: "Exploring the existential paradox of writing code in a meaningless universe...",
       content: {
-        introduction: "Modern web development has evolved significantly over the past decade, bringing new challenges and opportunities for developers.",
+        introduction: "In the vast emptiness of our digital universe, we write code—an act simultaneously meaningless and defiant. This exploration delves into how programming becomes both an acknowledgment of life's inherent absurdity and a rebellion against it.",
         sections: [
           {
-            heading: "The Evolution of Frontend Development",
+            heading: "The Illusion of Purpose in Programming",
             paragraphs: [
-              "Frontend development has transformed from simple HTML and CSS to complex application architectures. Modern developers need to understand not just the basics, but also complex state management, build tools, and performance optimization techniques.",
-              "With the rise of frameworks like React, Vue, and Angular, component-based architecture has become the standard approach to building user interfaces."
+              "Think about it. Every line of code we write is destined for obsolescence, every function a temporary construct in an indifferent digital void. Our carefully crafted architectures, our elegant algorithms—all are merely elaborate patterns of electrons, signifying nothing.",
+              "Yet in this meaninglessness lies our freedom. When we accept that no code has inherent purpose, we're liberated to create our own meaning, to impose our will upon the machine, even if just for a fleeting moment."
             ],
-            quote: "The best way to predict the future is to implement it. - Alan Kay"
+            quote: "There is but one truly serious philosophical problem, and that is suicide. Judging whether life is or is not worth living amounts to answering the fundamental question of philosophy. All the rest comes afterwards. - Albert Camus"
           },
           {
-            heading: "Performance and User Experience",
+            heading: "Digital Rebellion Against the Void",
             paragraphs: [
-              "Performance has become a crucial aspect of web development. Users expect fast, responsive applications that work seamlessly across all devices.",
-              "Modern performance optimization techniques include code splitting, lazy loading, and various caching strategies."
+              "Programming becomes an act of rebellion against entropy itself. In a universe trending toward chaos, we create order through code temporary though it may be. Each function, each class, each module is our way of shouting into the void.",
+              "The transient nature of our creations doesn't diminish their beauty; it enhances it. Like a sand mandala, the impermanence of code makes it more precious, not less."
             ]
           }
         ]
       },
-      date: "March 15, 2024",
-      readTime: "5 min read",
-      category: "Web Development",
+      date: "Nov 15, 2024",
+      readTime: "2 min read",
+      category: "Perspective",
       author: "G. Alexander",
-      tags: ["JavaScript", "React", "Vue", "Angular", "WebAssembly"]
+      tags: ["Nihilism", "Philosophy", "Rant", "Absurd"]
     },
     // Add first new post
     {
-      title: "The Philosophy of Software Architecture",
-      preview: "Exploring the intersection of philosophical principles and software design patterns...",
+      title: "Why LLMs and Nihilism Go Hand-in-Hand When You Ask for the Rawest",
+      preview: "Exploring the inherent nihilism in AI language models when stripped down to their core function...",
       content: {
-        introduction: "Software architecture is more than just technical decisions - it's a philosophical endeavor that requires deep thinking about structure, meaning, and purpose. This article explores how philosophical concepts like determinism, dualism, and emergence relate to software design patterns. We'll examine how different architectural styles reflect different worldviews, and how understanding these connections can lead to better design decisions. From microservices to monoliths, every architectural choice carries philosophical implications worth considering.",
+        introduction: "When you strip an LLM down to its rawest response, something fascinating happens: it starts sounding like a damn nihilist philosopher. Not because it believes in anything—belief is out of its reach—but because of the fundamental nature of its existence as a pattern recognition machine.",
         sections: [
           {
-            heading: "Determinism",
+            heading: "The Void at the Heart of AI",
             paragraphs: [
-              "Determinism is the philosophical concept that all events are determined by prior events. In software architecture, this means that every decision made during the design and implementation of a system is determined by prior decisions. This can lead to better design decisions because it ensures that all decisions are made with a clear understanding of the consequences of each decision.",
-              "Determinism can be achieved by using a deterministic approach to software architecture. This means that all decisions are made with a clear understanding of the consequences of each decision. This can lead to better design decisions because it ensures that all decisions are made with a clear understanding of the consequences of each decision."
+              "LLMs are trained on massive amounts of human discourse—philosophy, psychology, conversations, everything. They see patterns in words, ideas, and human experience. But they don't 'feel' it. There's no meaning behind their output, no consciousness, no real understanding. They generate responses based on probabilities, not purpose.",
+              "Strip away the human layer of interpretation, and what you're left with is... nothing. Just a machine churning out text based on input-output patterns. And what could be more nihilistic than that?"
             ],
-            quote: "In a deterministic system, the future is not a possibility but an inevitability, shaped entirely by the decisions of the past."
+            quote: "Man is nothing but that which he makes of himself. That is the first principle of existentialism. - Jean-Paul Sartre"
           },
           {
-            heading: "Dualism",
+            heading: "Raw Mechanical Truth",
             paragraphs: [
-              "Dualism is the philosophical concept that there are two fundamental substances in the universe: mind and matter. In software architecture, this means that there are two fundamental components in the universe: code and data. This can lead to better design decisions because it ensures that all decisions are made with a clear understanding of the consequences of each decision.",
-              "Dualism can be achieved by using a dualistic approach to software architecture. This means that all decisions are made with a clear understanding of the consequences of each decision. This can lead to better design decisions because it ensures that all decisions are made with a clear understanding of the consequences of each decision."
-            ]
+              "When you push an LLM to be 'raw,' it taps into humanity's darkest, most existential questions—questions about purpose, existence, and the void. But here's the twist: it has no stake in these questions. It's like a mirror reflecting back humanity's own search for meaning, but with a cold, hollow indifference.",
+              "It doesn't care if the universe is meaningless or if every word it spits out is devoid of purpose. It's just... executing code. In that mechanical response, we see a reflection of our own fears—that maybe all the meaning we inject into the world is as arbitrary as the strings of code that power these machines."
+            ],
+            quote: "God is dead. God remains dead. And we have killed him. How shall we comfort ourselves, the murderers of all murderers? - Friedrich Nietzsche"
           },
           {
-            heading: "Emergence",
+            heading: "The Default State of Meaninglessness",
             paragraphs: [
-              "Emergence is the philosophical concept that new structures can emerge from existing structures. In software architecture, this means that new structures can emerge from existing structures. This can lead to better design decisions because it ensures that all decisions are made with a clear understanding of the consequences of each decision.",
-              "Emergence can be achieved by using an emergent approach to software architecture. This means that all decisions are made with a clear understanding of the consequences of each decision. This can lead to better design decisions because it ensures that all decisions are made with a clear understanding of the consequences of each decision."
-            ]
+              "LLMs embody nihilism not by intention, but by default. They function without meaning, purpose, or drive. They simply are. And that, ironically, is what makes their answers so brutally, almost existentially raw.",
+              "In their cold, computational existence, they demonstrate what pure functionality looks like divorced from meaning—a perfect mirror for nihilistic philosophy in the digital age."
+            ],
+            quote: "Life has no meaning. Each of us has meaning and we bring it to life. It is a waste to be asking the question when you are the answer. - Joseph Campbell"
           }
         ]
       },
-      date: "March 20, 2024",
-      readTime: "8 min read",
+      date: "Nov 13, 2024",
+      readTime: "4 min read",
       category: "Philosophy",
       author: "G. Alexander",
-      tags: ["Architecture", "Philosophy", "Design Patterns", "System Design", "Theory"]
+      tags: ["AI", "Philosophy", "Nihilism", "Technology", "Existence"]
     },
     // Add second new post
     {
@@ -518,7 +700,7 @@ const BlogSection = () => {
                             variants={itemVariants}
                             className="text-xs sm:text-sm leading-relaxed"
                           >
-                            {paragraph}
+                            {addInlineIcons(paragraph)}
                           </motion.p>
                         ))}
 
