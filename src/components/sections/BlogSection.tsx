@@ -417,7 +417,7 @@ const BlogSection = () => {
             initial={{ opacity: 0, backdropFilter: "blur(0px)" }}
             animate={{ opacity: 1, backdropFilter: "blur(12px)" }}
             exit={{ opacity: 0, backdropFilter: "blur(0px)" }}
-            className="fixed inset-0 bg-black/90 backdrop-blur-lg flex items-center justify-center p-4 z-[60]"
+            className="fixed inset-0 bg-black/90 flex items-center justify-center p-4 z-[60]"
             onClick={(e) => {
               if (e.target === e.currentTarget) {
                 setSelectedPost(null);
