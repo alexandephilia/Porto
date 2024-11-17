@@ -131,9 +131,9 @@ const Grain = ({ opacity = 0.8 }) => {
           filter: theme === 'dark' 
             ? 'none' 
             : 'invert(1) brightness(0.8)',
-          backfaceVisibility: "hidden",
+          backfaceVisibility: "hidden" as const,
           perspective: 1000,
-          transformStyle: "preserve-3d"
+          transformStyle: "preserve-3d" as const
         }}
       />
     </div>
