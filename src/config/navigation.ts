@@ -1,4 +1,4 @@
-import { Github, Linkedin, Mail } from "lucide-react";
+import { Github, Linkedin, Mail, User, Briefcase, Phone, Globe, Code, Server, Palette, Layout } from "lucide-react";
 
 export interface NavLink {
   href: string;
@@ -9,33 +9,33 @@ export interface NavLink {
 
 export interface NavSection {
   title: string;
+  titleStyle?: React.CSSProperties;
   links: NavLink[];
 }
 
 export const navSections: NavSection[] = [
   {
-    title: "Main",
+    title: "About",
+    titleStyle: {
+      fontFamily: '"Libre Bodoni", serif',
+      fontStyle: 'italic'
+    },
     links: [
-      {
-        label: "About",
-        href: "/about",
-      },
-      {
-        label: "Projects",
-        href: "/projects",
-      },
-      {
-        label: "Experience",
-        href: "/experience",
-      },
-      {
-        label: "Skills",
-        href: "/skills",
-      },
-      {
-        label: "Contact",
-        href: "/contact",
-      },
+      { href: "/about", label: "About Me", icon: User, description: "Learn more about my background" },
+      { href: "/experience", label: "Experience", icon: Briefcase, description: "My professional journey" },
+      { href: "/contact", label: "Contact", icon: Phone, description: "Get in touch" },
+    ],
+  },
+  {
+    title: "Hobbies",
+    titleStyle: {
+      fontFamily: '"Libre Bodoni", serif',
+      fontStyle: 'italic'
+    },
+    links: [
+      { href: "/projects/ai", label: "AI Research", icon: Code, description: "Exploring artificial intelligence" },
+      { href: "/projects/components", label: "Web Components", icon: Globe, description: "Building reusable UI components" },
+      { href: "/projects/prompts", label: "Prompt Engineering", icon: Palette, description: "Crafting effective AI prompts" },
     ],
   },
 ];

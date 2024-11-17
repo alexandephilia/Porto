@@ -26,27 +26,26 @@ export const AnimatedGradientText = ({ text, className = "" }: AnimatedTextProps
 
   if (theme === 'light') {
     return (
-      <span className={`font-bold text-black ${className}`}>
+      <div className={`font-bold text-black ${className}`}>
         {text}
-      </span>
+      </div>
     );
   }
 
   return (
-    <motion.span
+    <motion.div
       animate={controls}
       className={`font-bold ${className}`}
       style={{
-        display: "inline-block",
-        backgroundImage: "linear-gradient(to right, #ffffff, rgba(255,255,255,0.5), rgba(255,255,255,0.5), rgba(255,255,255,0.5), #ffffff)",
+        backgroundImage: "linear-gradient(to right, #ffffff, #6b7280, #6b7280, #6b7280, #ffffff)",
         backgroundSize: "200% 100%",
         WebkitBackgroundClip: "text",
         backgroundClip: "text",
-        color: "transparent",
         WebkitTextFillColor: "transparent",
+        textFillColor: "transparent",
       }}
     >
       {text}
-    </motion.span>
+    </motion.div>
   );
 }; 

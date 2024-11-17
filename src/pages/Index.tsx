@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 import React from "react";
 import { ProjectsSection } from "@/components/sections/ProjectsSection";
 import { Code, Server } from "lucide-react";
-import { 
+import {
   SiReact,
   SiTypescript,
   SiTailwindcss,
@@ -59,6 +59,7 @@ import { MobileNav } from "@/components/navigation/MobileNav";
 import { HeroSection } from "@/components/sections/HeroSection";
 import { AnimatedGradientText } from "@/components/ui/animated-text";
 import { AnimatedTyping } from "@/components/ui/animated-typing";
+import { GradientBlur } from "@/components/ui/gradient-blur";
 
 const ListItem = React.forwardRef<
   React.ElementRef<"a">,
@@ -89,7 +90,7 @@ ListItem.displayName = "ListItem";
 const Grain = ({ opacity = 0.8 }) => {
   const controls = useAnimationControls();
   const { theme } = useTheme();
-  
+
   useEffect(() => {
     controls.start({
       x: ["0%", "-5%", "-15%", "7%", "-5%", "-15%", "15%", "0%", "3%", "-10%"],
@@ -120,7 +121,7 @@ const Grain = ({ opacity = 0.8 }) => {
         style={{
           backgroundSize: "64px 64px",
           backgroundRepeat: "repeat",
-          background: theme === 'dark' 
+          background: theme === 'dark'
             ? "url('https://framerusercontent.com/images/rR6HYXBrMmX4cRpXfXUOvpvpB0.png')"
             : "url('https://framerusercontent.com/images/rR6HYXBrMmX4cRpXfXUOvpvpB0.png')",
           opacity: theme === 'dark' ? opacity : opacity * 0.8,
@@ -128,12 +129,12 @@ const Grain = ({ opacity = 0.8 }) => {
           width: "400%",
           height: "400%",
           position: "absolute",
-          filter: theme === 'dark' 
-            ? 'none' 
+          filter: theme === 'dark'
+            ? 'none'
             : 'invert(1) brightness(0.8)',
-          backfaceVisibility: "hidden" as const,
+          backfaceVisibility: "hidden",
           perspective: 1000,
-          transformStyle: "preserve-3d" as const
+          transformStyle: "preserve-3d"
         }}
       />
     </div>
@@ -159,9 +160,9 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <Grain opacity={0.06} />
       {/* Navigation */}
-      
+
       <nav className="fixed w-full top-0 z-50">
-        <div 
+        <div
           className="relative"
           style={{
             transform: "translateZ(0)",
@@ -169,144 +170,144 @@ const Index = () => {
           }}
         >
           {/* Update blur layer with matching styles */}
-          <div 
-            className="absolute inset-0 bg-background/80 backdrop-blur-sm" 
+          <div
+            className="absolute inset-0 bg-background/80 backdrop-blur-sm"
           />
-          
+
           {/* Content container with proper z-index */}
           <div className="relative z-10 container max-w-5xl flex h-16 items-center justify-between">
-          {/* Left side - Logo and Desktop Navigation */}
-          <div className="flex items-center gap-6">
-            <AnimatedGradientText 
-              text="Portfolio" 
-              className="text-xl"
-            />
-            {/* Desktop Navigation - Moved here */}
-            <div className="hidden md:block">
-              <NavigationMenu>
-                <NavigationMenuList>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger>About</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                        <li className="row-span-3">
-                          <NavigationMenuLink asChild>
-                          <a
-                            className="flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/30 to-muted/20 p-6 no-underline outline-none focus:shadow-md"
-                            href="/"
-                          >
-                            <div className="mb-2 mt-2 text-lg font-bold">
-                              Garry Alexander
-                            </div>
-                            <p className="text-sm leading-tight text-muted-foreground w-[205px] mb-4">
-                              A <strong>nihilist</strong> who loves to code and coffee ☕
-                            </p>
-                            <div className="grid grid-cols-2 gap-2 mt-auto">
-                              <Button 
-                                variant="outline"
-                                size="sm"
-                                className="hover:blur-[1px] transition-all duration-300"
+            {/* Left side - Logo and Desktop Navigation */}
+            <div className="flex items-center gap-6">
+              <AnimatedGradientText
+                text="Portfolio"
+                className="text-xl"
+              />
+              {/* Desktop Navigation - Moved here */}
+              <div className="hidden md:block">
+                <NavigationMenu>
+                  <NavigationMenuList>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>About</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                          <li className="row-span-3">
+                            <NavigationMenuLink asChild>
+                              <a
+                                className="flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/30 to-muted/20 p-6 no-underline outline-none focus:shadow-md"
+                                href="/"
                               >
-                                GitHub
-                              </Button>
-                              <Button 
-                                variant="outline"
-                                size="sm"
-                                className="hover:blur-[1px] transition-all duration-300"
-                              >
-                                LinkedIn
-                              </Button>
-                              <Button 
-                                variant="outline"
-                                size="sm"
-                                className="hover:blur-[1px] transition-all duration-300"
-                              >
-                                Twitter
-                              </Button>
-                              <Button 
-                                variant="outline"
-                                size="sm"
-                                className="hover:blur-[1px] transition-all duration-300"
-                              >
-                                Email
-                              </Button>
-                              <Button 
-                                variant="outline"
-                                size="sm"
-                                className="hover:blur-[1px] transition-all duration-300"
-                                asChild
-                              >
-                                <a  href="resume.pdf" target="_blank" rel="noopener noreferrer">
-                                  Resume
-                                </a>
-                              </Button>
-                              <Button 
-                                variant="outline"
-                                size="sm"
-                                className="hover:blur-[1px] transition-all duration-300"
-                              >
-                                Blog
-                              </Button>
-                            </div>
-                          </a>
-                          </NavigationMenuLink>
-                        </li>
-                        <ListItem href="/about" title="About Me">
-                          <span className="font-bold">Learn more about my background and experience</span>
-                        </ListItem>
-                        <ListItem href="/experience" title="Experience">
-                          <span className="font-bold">View my professional journey and achievements</span>
-                        </ListItem>
-                        <ListItem href="/contact" title="Contact">
-                          <span className="font-bold">Get in touch for collaboration</span>
-                        </ListItem>
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger>Projects</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                        <ListItem href="/projects/web" title="Web Development">
-                          Modern web applications built with React and TypeScript
-                        </ListItem>
-                        <ListItem href="/projects/mobile" title="Mobile Development">
-                          Cross-platform mobile applications
-                        </ListItem>
-                        <ListItem href="/projects/backend" title="Backend Development">
-                          Scalable backend solutions and APIs
-                        </ListItem>
-                        <ListItem href="/projects/design" title="UI/UX Design">
-                          User interface and experience design projects
-                        </ListItem>
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                  <NavigationMenuItem>
-                    <NavigationMenuTrigger>Skills</NavigationMenuTrigger>
-                    <NavigationMenuContent>
-                      <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                        <ListItem href="/skills/frontend" title="Frontend">
-                          React, TypeScript, Tailwind CSS, Next.js
-                        </ListItem>
-                        <ListItem href="/skills/backend" title="Backend">
-                          Node.js, Express, PostgreSQL, MongoDB
-                        </ListItem>
-                      </ul>
-                    </NavigationMenuContent>
-                  </NavigationMenuItem>
-                </NavigationMenuList>
-              </NavigationMenu>
+                                <div className="mb-2 mt-2 text-lg font-bold">
+                                  Garry Alexander
+                                </div>
+                                <p className="text-sm leading-tight text-muted-foreground w-[205px] mb-4">
+                                  A <strong>nihilist</strong> who loves to code and coffee ☕
+                                </p>
+                                <div className="grid grid-cols-2 gap-2 mt-auto">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="hover:blur-[1px] transition-all duration-300"
+                                  >
+                                    GitHub
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="hover:blur-[1px] transition-all duration-300"
+                                  >
+                                    LinkedIn
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="hover:blur-[1px] transition-all duration-300"
+                                  >
+                                    Twitter
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="hover:blur-[1px] transition-all duration-300"
+                                  >
+                                    Email
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="hover:blur-[1px] transition-all duration-300"
+                                    asChild
+                                  >
+                                    <a href="resume.pdf" target="_blank" rel="noopener noreferrer">
+                                      Resume
+                                    </a>
+                                  </Button>
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="hover:blur-[1px] transition-all duration-300"
+                                  >
+                                    Blog
+                                  </Button>
+                                </div>
+                              </a>
+                            </NavigationMenuLink>
+                          </li>
+                          <ListItem href="/about" title="About Me">
+                            <span className="font-bold">Learn more about my background and experience</span>
+                          </ListItem>
+                          <ListItem href="/experience" title="Experience">
+                            <span className="font-bold">View my professional journey and achievements</span>
+                          </ListItem>
+                          <ListItem href="/contact" title="Contact">
+                            <span className="font-bold">Get in touch for collaboration</span>
+                          </ListItem>
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>Projects</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                          <ListItem href="/projects/web" title="Web Development">
+                            Modern web applications built with React and TypeScript
+                          </ListItem>
+                          <ListItem href="/projects/mobile" title="Mobile Development">
+                            Cross-platform mobile applications
+                          </ListItem>
+                          <ListItem href="/projects/backend" title="Backend Development">
+                            Scalable backend solutions and APIs
+                          </ListItem>
+                          <ListItem href="/projects/design" title="UI/UX Design">
+                            User interface and experience design projects
+                          </ListItem>
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                    <NavigationMenuItem>
+                      <NavigationMenuTrigger>Skills</NavigationMenuTrigger>
+                      <NavigationMenuContent>
+                        <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                          <ListItem href="/skills/frontend" title="Frontend">
+                            React, TypeScript, Tailwind CSS, Next.js
+                          </ListItem>
+                          <ListItem href="/skills/backend" title="Backend">
+                            Node.js, Express, PostgreSQL, MongoDB
+                          </ListItem>
+                        </ul>
+                      </NavigationMenuContent>
+                    </NavigationMenuItem>
+                  </NavigationMenuList>
+                </NavigationMenu>
+              </div>
             </div>
-          </div>
 
-          {/* Right side - Mobile Menu and Theme Toggle */}
-          <div className="flex items-center gap-2">
-            {/* Mobile Navigation */}
-            <div className="md:hidden">
-              <MobileNav />
-            </div>
-            <ModeToggle />
+            {/* Right side - Mobile Menu and Theme Toggle */}
+            <div className="flex items-center gap-2">
+              {/* Mobile Navigation */}
+              <div className="md:hidden">
+                <MobileNav />
+              </div>
+              <ModeToggle />
             </div>
           </div>
         </div>
@@ -314,7 +315,7 @@ const Index = () => {
 
       {/* Hero Section */}
       <div className="container max-w-5xl px-4 sm:px-6 md:px-8">
-        <HeroSection 
+        <HeroSection
           name="Garry Alexander"
           title={
             <>
@@ -327,8 +328,8 @@ const Index = () => {
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-2">
                   <span>who contemplate about</span>
-                  <AnimatedTyping 
-                    words={["coffee.", "existence.", "space.", "futurism."]} 
+                  <AnimatedTyping
+                    words={["coffee.", "existence.", "space.", "futurism."]}
                     className="font-bold text-[#2a2a29] drop-shadow-[0_0_0.0rem_#656564] animate-pulse mix-blend-screen filter brightness-150 dark:text-[#EEEEEE] dark:drop-shadow-[0_0_0.3rem_#00ff9570] dark:animate-pulse dark:mix-blend-screen dark:filter dark:brightness-100"
                   />
                 </div>
@@ -356,7 +357,7 @@ const Index = () => {
         <BlogSection />
       </div>
 
-    
+
       {/* Experience Section */}
       <div className="container max-w-5xl px-4 sm:px-6 md:px-8">
         <ExperienceSection />
@@ -368,37 +369,45 @@ const Index = () => {
         <ContactSection />
       </div>
 
+
+
+
+
+
       {/* Footer Section */}
-      <footer className="border-t mt-16">
-      <div className="container max-w-5xl py-8">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Coffee className="h-4 w-4" />
-            <span className="text-sm text-muted-foreground">
-              Built with caffeine by <strong>Garry Alexander</strong>
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-muted-foreground">
-              Deployed on
-            </span>
-            <a 
-              href="https://vercel.com"
-              target="_blank"
-              rel="noopener noreferrer" 
-              className="hover:opacity-70 transition-opacity"
-            >
-              <svg height="16" viewBox="0 0 283 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M141.04 16c-11.04 0-19 7.2-19 18s8.96 18 20 18c6.67 0 12.55-2.64 16.19-7.09l-7.65-4.42c-2.02 2.21-5.09 3.5-8.54 3.5-4.79 0-8.86-2.5-10.37-6.5h28.02c.22-1.12.35-2.28.35-3.5 0-10.79-7.96-17.99-19-17.99zm-9.46 14.5c1.25-3.99 4.67-6.5 9.45-6.5 4.79 0 8.21 2.51 9.45 6.5h-18.9zM248.72 16c-11.04 0-19 7.2-19 18s8.96 18 20 18c6.67 0 12.55-2.64 16.19-7.09l-7.65-4.42c-2.02 2.21-5.09 3.5-8.54 3.5-4.79 0-8.86-2.5-10.37-6.5h28.02c.22-1.12.35-2.28.35-3.5 0-10.79-7.96-17.99-19-17.99zm-9.45 14.5c1.25-3.99 4.67-6.5 9.45-6.5 4.79 0 8.21 2.51 9.45 6.5h-18.9zM200.24 34c0 6 3.92 10 10 10 4.12 0 7.21-1.87 8.8-4.92l7.68 4.43c-3.18 5.3-9.14 8.49-16.48 8.49-11.05 0-19-7.2-19-18s7.96-18 19-18c7.34 0 13.29 3.19 16.48 8.49l-7.68 4.43c-1.59-3.05-4.68-4.92-8.8-4.92-6.07 0-10 4-10 10zm82.48-29v46h-9V5h9zM36.95 0L73.9 64H0L36.95 0zm92.38 5l-27.71 48L73.91 5H85.3l17.32 30 17.32-30h10.39zm58.91 12v9.69c-1-.29-2.06-.49-3.2-.49-5.81 0-10 4-10 10V51h-9V17h9v9.2c0-5.08 5.91-9.2 13.2-9.2z" fill="currentColor"/>
-              </svg>
-            </a>
+      <footer className="border-t mt-16 relative z-10">
+        <div className="container max-w-5xl py-8">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-2">
+              <Coffee className="h-4 w-4" />
+              <span className="text-sm text-muted-foreground">
+                Built with caffeine by <strong>Garry Alexander</strong>
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">
+                Deployed on
+              </span>
+              <a
+                href="https://vercel.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:opacity-70 transition-opacity"
+              >
+                <svg height="16" viewBox="0 0 283 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M141.04 16c-11.04 0-19 7.2-19 18s8.96 18 20 18c6.67 0 12.55-2.64 16.19-7.09l-7.65-4.42c-2.02 2.21-5.09 3.5-8.54 3.5-4.79 0-8.86-2.5-10.37-6.5h28.02c.22-1.12.35-2.28.35-3.5 0-10.79-7.96-17.99-19-17.99zm-9.46 14.5c1.25-3.99 4.67-6.5 9.45-6.5 4.79 0 8.21 2.51 9.45 6.5h-18.9zM248.72 16c-11.04 0-19 7.2-19 18s8.96 18 20 18c6.67 0 12.55-2.64 16.19-7.09l-7.65-4.42c-2.02 2.21-5.09 3.5-8.54 3.5-4.79 0-8.86-2.5-10.37-6.5h28.02c.22-1.12.35-2.28.35-3.5 0-10.79-7.96-17.99-19-17.99zm-9.45 14.5c1.25-3.99 4.67-6.5 9.45-6.5 4.79 0 8.21 2.51 9.45 6.5h-18.9zM200.24 34c0 6 3.92 10 10 10 4.12 0 7.21-1.87 8.8-4.92l7.68 4.43c-3.18 5.3-9.14 8.49-16.48 8.49-11.05 0-19-7.2-19-18s7.96-18 19-18c7.34 0 13.29 3.19 16.48 8.49l-7.68 4.43c-1.59-3.05-4.68-4.92-8.8-4.92-6.07 0-10 4-10 10zm82.48-29v46h-9V5h9zM36.95 0L73.9 64H0L36.95 0zm92.38 5l-27.71 48L73.91 5H85.3l17.32 30 17.32-30h10.39zm58.91 12v9.69c-1-.29-2.06-.49-3.2-.49-5.81 0-10 4-10 10V51h-9V17h9v9.2c0-5.08 5.91-9.2 13.2-9.2z" fill="currentColor" />
+                </svg>
+              </a>
+            </div>
           </div>
         </div>
-      </div>
-    </footer>
+      </footer>
 
       {/* Floating Menu */}
       <FloatingMenu />
+
+      {/* Add the GradientBlur component */}
+      <GradientBlur />
     </div>
   );
 };
