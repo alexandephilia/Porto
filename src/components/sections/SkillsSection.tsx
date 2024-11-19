@@ -1,7 +1,7 @@
 // Import necessary dependencies from framer-motion for animations
 import { motion, useScroll, useTransform, AnimatePresence, useSpring } from 'framer-motion';
 // Import React hooks
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 // Import UI components from shadcn/ui
 import {
   Card,
@@ -49,6 +49,7 @@ import {
 // Import custom icons
 import CursorIcon from '../icons/CursorIcon';
 import { RadixIcon } from '../icons/RadixIcon'
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 
 // Interface defining the structure of a tool/technology
 interface Tool {
@@ -79,160 +80,204 @@ const SkillCard: React.FC<Skill & { isExpanded: boolean; onToggle: () => void }>
   isExpanded,
   onToggle
 }) => {
+  const [isNear, setIsNear] = useState(false);
+  const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const isNearButton = x >= -50 && x <= rect.width + 50 && y >= -50 && y <= rect.height + 50;
+
+        setIsNear(isNearButton);
+        if (isNearButton) {
+          setCursorPosition({ x, y });
+        }
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
   return (
-    <Card
-      className="group hover:shadow-lg transition-all duration-500 cursor-pointer min-h-[400px] flex flex-col"
-      onClick={onToggle}
+    <motion.div
+      ref={cardRef}
+      className="relative p-[1px] rounded-lg overflow-hidden w-full"
     >
-      <CardHeader className="flex-1 min-h-[100px]">
-        <div className="flex items-center gap-3">
-          <div className="w-full">
-            <CardTitle className="text-xl mb-2">{title}</CardTitle>
-            {/* Progress bar showing skill proficiency */}
-            <div className="mt-2 flex items-center gap-2">
-              <div className="h-2 w-48 bg-muted rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-primary"
-                  initial={{ width: 0 }}
-                  animate={{ width: `${proficiency}%` }}
-                  transition={{ duration: 1, delay: 0.2 }}
-                />
+      {/* Glow effect */}
+      <motion.div
+        className="absolute inset-0"
+        style={{
+          opacity: isNear ? 1 : 0,
+          background: `radial-gradient(circle 150px at ${cursorPosition.x}px ${cursorPosition.y}px, rgba(255,255,255,0.4), transparent 50%)`,
+          pointerEvents: 'none',
+        }}
+        transition={{ opacity: { duration: 0.3 } }}
+      />
+
+      {/* Content */}
+      <div className="relative z-10">
+        <Card
+          className="group hover:shadow-lg hover:blur-[2px] transition-all duration-500 cursor-pointer min-h-[400px] flex flex-col"
+          onClick={onToggle}
+        >
+          <CardHeader className="flex-1 min-h-[100px]">
+            <div className="flex items-center gap-3">
+              <div className="w-full">
+                <CardTitle className="text-xl mb-2">{title}</CardTitle>
+                {/* Progress bar showing skill proficiency */}
+                <div className="mt-2 flex items-center gap-2">
+                  <div className="h-2 w-48 bg-muted rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-primary"
+                      initial={{ width: 0 }}
+                      animate={{ width: `${proficiency}%` }}
+                      transition={{ duration: 1, delay: 0.2 }}
+                    />
+                  </div>
+                  <span className="text-sm text-muted-foreground">{proficiency}%</span>
+                </div>
               </div>
-              <span className="text-sm text-muted-foreground">{proficiency}%</span>
             </div>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-4 flex-grow">
-        {/* Updated description text styling for consistency */}
-        <p className="text-sm text-muted-foreground h-[72px] line-clamp-3">{description}</p>
+          </CardHeader>
+          <CardContent className="space-y-4 flex-grow">
+            {/* Updated description text styling for consistency */}
+            <p className="text-sm text-muted-foreground h-[72px] line-clamp-3">{description}</p>
 
-        {/* Tools and technologies section */}
-        <div className="space-y-3">
-          <h4 className="text-sm font-medium">Tools & Technologies</h4>
-          <div className="flex flex-wrap gap-2">
-            {tools.map((tool, index) => (
-              <TooltipProvider key={index}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <div className="flex items-center gap-2 p-2 rounded-md bg-muted hover:bg-accent hover:blur-[2px] transition-all duration-300 cursor-pointer group/tool">
-                      <tool.icon className="h-5 w-5 group-hover/tool:scale-110 transition-transform duration-300" />
-                      <span className="text-sm">{tool.name}</span>
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="text-sm">{tool.details}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ))}
-          </div>
-        </div>
+            {/* Tools and technologies section */}
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium">Tools & Technologies</h4>
+              <div className="flex flex-wrap gap-2">
+                {tools.map((tool, index) => (
+                  <TooltipProvider key={index}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <div className="flex items-center gap-2 p-2 rounded-md bg-muted hover:bg-accent hover:blur-[2px] transition-all duration-300 cursor-pointer group/tool">
+                          <tool.icon className="h-5 w-5 group-hover/tool:scale-110 transition-transform duration-300" />
+                          <span className="text-sm">{tool.name}</span>
+                        </div>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="text-sm">{tool.details}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                ))}
+              </div>
+            </div>
 
-        {/* Expandable content section */}
-        <div className="overflow-hidden">
-          <AnimatePresence mode="sync">
-            {isExpanded && (
-              <motion.div
-                initial={{
-                  height: 0,
-                  opacity: 0,
-                  y: -20,
-                  filter: "blur(10px)"
-                }}
-                animate={{
-                  height: "auto",
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)"
-                }}
-                exit={{
-                  height: 0,
-                  opacity: 0,
-                  y: -20,
-                  filter: "blur(10px)"
-                }}
-                transition={{
-                  duration: 0.9,
-                  ease: [0.4, 0, 0.2, 1]
-                }}
-                className="pt-4 border-t space-y-4"
-              >
-                {/* Detailed description section */}
-                {detailedDescription && (
+            {/* Expandable content section */}
+            <div className="overflow-hidden">
+              <AnimatePresence mode="sync">
+                {isExpanded && (
                   <motion.div
-                    initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    transition={{ delay: 0.5, duration: 0.7 }}
-                    className="space-y-2"
+                    initial={{
+                      height: 0,
+                      opacity: 0,
+                      y: -20,
+                      filter: "blur(10px)"
+                    }}
+                    animate={{
+                      height: "auto",
+                      opacity: 1,
+                      y: 0,
+                      filter: "blur(0px)"
+                    }}
+                    exit={{
+                      height: 0,
+                      opacity: 0,
+                      y: -20,
+                      filter: "blur(10px)"
+                    }}
+                    transition={{
+                      duration: 0.9,
+                      ease: [0.4, 0, 0.2, 1]
+                    }}
+                    className="pt-4 border-t space-y-4"
                   >
-                    <h4 className="font-medium">Overview</h4>
-                    <p className="text-sm text-muted-foreground">{detailedDescription}</p>
-                  </motion.div>
-                )}
-
-                {/* Key features section */}
-                {keyFeatures && keyFeatures.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
-                    animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                    transition={{ delay: 0.4, duration: 0.5 }}
-                    className="space-y-2"
-                  >
-                    <h4 className="font-medium">Key Features</h4>
-                    <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
-                      {keyFeatures.map((feature, index) => (
-                        <li key={index}>{feature}</li>
-                      ))}
-                    </ul>
-                  </motion.div>
-                )}
-
-                {/* Tool proficiency section */}
-                <motion.div
-                  initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  transition={{ delay: 0.5, duration: 0.5 }}
-                  className="space-y-2"
-                >
-                  <h4 className="font-medium">Tool Proficiency</h4>
-                  <div className="grid grid-cols-2 gap-2">
-                    {tools.map((tool, index) => (
+                    {/* Detailed description section */}
+                    {detailedDescription && (
                       <motion.div
-                        key={index}
                         initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
                         animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                        transition={{
-                          delay: 0.5 + index * 0.15,
-                          duration: 0.5
-                        }}
-                        className="bg-muted p-3 rounded-lg"
+                        transition={{ delay: 0.5, duration: 0.7 }}
+                        className="space-y-2"
                       >
-                        <div className="flex items-center gap-2">
-                          <tool.icon className="h-4 w-4" />
-                          <span className="text-sm font-medium">{tool.name}</span>
-                        </div>
-                        {tool.level && (
-                          <Badge
-                            variant="secondary"
-                            className="mt-1 text-xs font-normal hover:blur-[2px] transition-all duration-300 bg-muted-foreground/10"
-                          >
-                            {tool.level}
-                          </Badge>
-                        )}
-                        {tool.details && (
-                          <p className="text-xs text-muted-foreground mt-2">{tool.details}</p>
-                        )}
+                        <h4 className="font-medium">Overview</h4>
+                        <p className="text-sm text-muted-foreground">{detailedDescription}</p>
                       </motion.div>
-                    ))}
-                  </div>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </CardContent>
-    </Card>
+                    )}
+
+                    {/* Key features section */}
+                    {keyFeatures && keyFeatures.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+                        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                        transition={{ delay: 0.4, duration: 0.5 }}
+                        className="space-y-2"
+                      >
+                        <h4 className="font-medium">Key Features</h4>
+                        <ul className="list-disc list-inside text-sm text-muted-foreground space-y-1">
+                          {keyFeatures.map((feature, index) => (
+                            <li key={index}>{feature}</li>
+                          ))}
+                        </ul>
+                      </motion.div>
+                    )}
+
+                    {/* Tool proficiency section */}
+                    <motion.div
+                      initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+                      animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                      transition={{ delay: 0.5, duration: 0.5 }}
+                      className="space-y-2"
+                    >
+                      <h4 className="font-medium">Tool Proficiency</h4>
+                      <div className="grid grid-cols-2 gap-2">
+                        {tools.map((tool, index) => (
+                          <motion.div
+                            key={index}
+                            initial={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+                            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                            transition={{
+                              delay: 0.5 + index * 0.15,
+                              duration: 0.5
+                            }}
+                            className="bg-muted p-3 rounded-lg"
+                          >
+                            <div className="flex items-center gap-2">
+                              <tool.icon className="h-4 w-4" />
+                              <span className="text-sm font-medium">{tool.name}</span>
+                            </div>
+                            {tool.level && (
+                              <Badge
+                                variant="secondary"
+                                className="mt-1 text-xs font-normal hover:blur-[2px] transition-all duration-300 bg-muted-foreground/10"
+                              >
+                                {tool.level}
+                              </Badge>
+                            )}
+                            {tool.details && (
+                              <p className="text-xs text-muted-foreground mt-2">{tool.details}</p>
+                            )}
+                          </motion.div>
+                        ))}
+                      </div>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    </motion.div>
   );
 };
 
@@ -422,51 +467,97 @@ export const SkillsSection: React.FC = () => {
           whileInView="show"
           viewport={{ once: true, margin: "-50px" }}
         >
-          {additionalSkills.map((skill, index) => (
-            <motion.div
-              key={index}
-              variants={{
-                hidden: {
-                  opacity: 0,
-                  y: 20,
-                  filter: "blur(10px)"
-                },
-                show: {
-                  opacity: 1,
-                  y: 0,
-                  filter: "blur(0px)",
-                  transition: {
-                    duration: 0.8,
-                    ease: [0.4, 0, 0.2, 1]
+          {additionalSkills.map((skill, index) => {
+            const [isNear, setIsNear] = useState(false);
+            const [cursorPosition, setCursorPosition] = useState({ x: 0, y: 0 });
+            const cardRef = useRef<HTMLDivElement>(null);
+
+            useEffect(() => {
+              const handleMouseMove = (e: MouseEvent) => {
+                if (cardRef.current) {
+                  const rect = cardRef.current.getBoundingClientRect();
+                  const x = e.clientX - rect.left;
+                  const y = e.clientY - rect.top;
+                  const isNearButton = x >= -50 && x <= rect.width + 50 && y >= -50 && y <= rect.height + 50;
+
+                  setIsNear(isNearButton);
+                  if (isNearButton) {
+                    setCursorPosition({ x, y });
                   }
                 }
-              }}
-            >
-              <Card className="group hover:-translate-y-1 hover:shadow-xl hover:blur-[2px] transition-all duration-300 aspect-square">
-                <CardContent className="flex flex-col items-center justify-between h-full p-3">
-                  <div className="flex-1 flex items-center">
-                    <skill.icon className="h-7 w-7 group-hover:scale-110 transition-transform duration-300" />
+              };
+
+              document.addEventListener('mousemove', handleMouseMove);
+              return () => {
+                document.removeEventListener('mousemove', handleMouseMove);
+              };
+            }, []);
+
+            return (
+              <motion.div
+                key={index}
+                variants={{
+                  hidden: {
+                    opacity: 0,
+                    y: 20,
+                    filter: "blur(10px)"
+                  },
+                  show: {
+                    opacity: 1,
+                    y: 0,
+                    filter: "blur(0px)",
+                    transition: {
+                      duration: 0.8,
+                      ease: [0.4, 0, 0.2, 1]
+                    }
+                  }
+                }}
+              >
+                <motion.div
+                  ref={cardRef}
+                  className="relative p-[1px] rounded-lg overflow-hidden w-full"
+                >
+                  {/* Glow effect */}
+                  <motion.div
+                    className="absolute inset-0"
+                    style={{
+                      opacity: isNear ? 1 : 0,
+                      background: `radial-gradient(circle 150px at ${cursorPosition.x}px ${cursorPosition.y}px, rgba(255,255,255,0.4), transparent 50%)`,
+                      pointerEvents: 'none',
+                    }}
+                    transition={{ opacity: { duration: 0.3 } }}
+                  />
+
+                  {/* Content */}
+                  <div className="relative z-10">
+                    <Card className="group hover:blur-[2px] transition-all duration-300 aspect-square">
+                      <CardContent className="flex flex-col items-center justify-between h-full p-3">
+                        <div className="flex-1 flex items-center">
+                          <skill.icon className="h-7 w-7 group-hover:scale-110 transition-transform duration-300" />
+                        </div>
+                        <div className="flex-1 flex flex-col items-center justify-center gap-1.5">
+                          <p className="text-xs font-medium sm:text-sm">{skill.name}</p>
+                          <Badge
+                            variant="secondary"
+                            className="text-[10px] font-normal bg-muted-foreground/10 px-2 py-0"
+                          >
+                            {skill.level}
+                          </Badge>
+                        </div>
+                        {skill.details && (
+                          <div className="flex-1 flex items-center">
+                            <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
+                              {skill.details}
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
                   </div>
-                  <div className="flex-1 flex flex-col items-center justify-center gap-1.5">
-                    <p className="text-xs font-medium sm:text-sm">{skill.name}</p>
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] font-normal bg-muted-foreground/10 px-2 py-0"
-                    >
-                      {skill.level}
-                    </Badge>
-                  </div>
-                  {skill.details && (
-                    <div className="flex-1 flex items-center">
-                      <p className="text-[10px] sm:text-xs text-muted-foreground text-center">
-                        {skill.details}
-                      </p>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+                </motion.div>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </motion.section>
