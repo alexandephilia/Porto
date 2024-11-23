@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { useRef } from "react";
+import { ShimmerButton } from "@/components/ui/shimmer-button";
 
 interface ExperienceItem {
   date: string;
@@ -19,14 +20,14 @@ const experienceData: ExperienceItem[] = [
   {
     date: "2021 - Now",
     title: "Front End Developer",
-    company: "Full Time", 
+    company: "Full Time",
     description: "Built responsive web development using HTML, CSS, JavaScript. Bootstrap, React, Next.js and TypeScript. Implemented modern UI/UX designs and optimized performance."
   }
 ];
 
 export const ExperienceSection = () => {
   const sectionRef = useRef<HTMLElement>(null);
-  
+
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
@@ -63,7 +64,7 @@ export const ExperienceSection = () => {
   };
 
   const cardVariants = {
-    hidden: (isEven: boolean) => ({ 
+    hidden: (isEven: boolean) => ({
       x: isEven ? 50 : -50,
       y: 50,
       opacity: 0,
@@ -71,7 +72,7 @@ export const ExperienceSection = () => {
       scale: 0.95,
       rotate: isEven ? 5 : -5
     }),
-    visible: { 
+    visible: {
       x: 0,
       y: 0,
       opacity: 1,
@@ -86,20 +87,13 @@ export const ExperienceSection = () => {
         duration: 0.8,
         ease: "easeOut"
       }
-    },
-    hover: {
-      scale: 1.02,
-      y: -5,
-      transition: {
-        duration: 0.2,
-        ease: "easeOut"
-      }
     }
   };
 
   return (
-    <motion.section 
+    <motion.section
       ref={sectionRef}
+      id="experience"
       className="relative py-16 overflow-hidden w-full"
       style={{
         opacity,
@@ -113,8 +107,8 @@ export const ExperienceSection = () => {
       <h2 className="text-3xl font-bold text-center mb-12">Experience Timeline</h2>
       <div className="relative max-w-3xl mx-auto px-4">
         <div className="absolute left-1/2 transform -translate-x-1/2 w-0.5 h-full bg-border hidden md:block" />
-        
-        <motion.div 
+
+        <motion.div
           className="space-y-8 md:space-y-12 w-full"
           variants={container}
           initial="hidden"
@@ -143,35 +137,27 @@ export const ExperienceSection = () => {
                     damping: 20,
                     stiffness: 90
                   }
-                },
-                hover: {
-                  scale: 1.02,
-                  y: -5,
-                  transition: {
-                    duration: 0.2,
-                    ease: "easeOut"
-                  }
                 }
               }}
               initial="hidden"
               whileInView="visible"
-              whileHover="hover"
               viewport={{ once: true, margin: "-100px" }}
-              className={`flex flex-col md:flex-row ${
-                index % 2 === 0 ? 'md:flex-row-reverse' : ''
-              } items-center w-full overflow-hidden`}
+              className={`flex flex-col md:flex-row ${index % 2 === 0 ? 'md:flex-row-reverse' : ''
+                } items-center w-full overflow-hidden`}
             >
               <div className="w-full md:w-1/2 p-4">
-                <Card className="transition-all duration-300 hover:blur-[2px]">
-                  <CardHeader>
-                    <CardTitle>{item.title}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{item.company}</p>
-                    <p className="text-sm text-muted-foreground">{item.date}</p>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm">{item.description}</p>
-                  </CardContent>
-                </Card>
+                <ShimmerButton className="w-full">
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>{item.title}</CardTitle>
+                      <p className="text-sm text-muted-foreground">{item.company}</p>
+                      <p className="text-sm text-muted-foreground">{item.date}</p>
+                    </CardHeader>
+                    <CardContent>
+                      <p className="text-sm">{item.description}</p>
+                    </CardContent>
+                  </Card>
+                </ShimmerButton>
               </div>
               <div className="hidden md:block md:w-1/2" />
             </motion.div>

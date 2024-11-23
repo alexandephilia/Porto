@@ -189,79 +189,69 @@ const Index = () => {
                     <NavigationMenuItem>
                       <NavigationMenuTrigger>About</NavigationMenuTrigger>
                       <NavigationMenuContent>
-                        <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-                          <li className="row-span-3">
-                            <NavigationMenuLink asChild>
-                              <a
-                                className="flex h-full w-full select-none flex-col justify-start rounded-md bg-gradient-to-b from-muted/30 to-muted/20 p-6 no-underline outline-none focus:shadow-md"
-                                href="/"
-                              >
-                                <div className="mb-2 mt-2 text-lg font-bold">
-                                  Garry Alexander
-                                </div>
-                                <p className="text-sm leading-tight text-muted-foreground w-[205px] mb-4">
-                                  A <strong>nihilist</strong> who loves to code and coffee ☕
-                                </p>
-                                <div className="grid grid-cols-2 gap-2 mt-auto">
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="hover:blur-[1px] transition-all duration-300"
-                                  >
-                                    GitHub
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="hover:blur-[1px] transition-all duration-300"
-                                  >
-                                    LinkedIn
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="hover:blur-[1px] transition-all duration-300"
-                                  >
-                                    Twitter
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="hover:blur-[1px] transition-all duration-300"
-                                  >
-                                    Email
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="hover:blur-[1px] transition-all duration-300"
-                                    asChild
-                                  >
-                                    <a href="resume.pdf" target="_blank" rel="noopener noreferrer">
-                                      Resume
-                                    </a>
-                                  </Button>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="hover:blur-[1px] transition-all duration-300"
-                                  >
-                                    Blog
-                                  </Button>
-                                </div>
-                              </a>
-                            </NavigationMenuLink>
-                          </li>
-                          <ListItem href="/about" title="About Me">
-                            <span className="font-bold">Learn more about my background and experience</span>
-                          </ListItem>
-                          <ListItem href="/experience" title="Experience">
-                            <span className="font-bold">View my professional journey and achievements</span>
-                          </ListItem>
-                          <ListItem href="/contact" title="Contact">
-                            <span className="font-bold">Get in touch for collaboration</span>
-                          </ListItem>
-                        </ul>
+                        <div className="w-[520px] p-6">
+                          <div className="grid grid-cols-[250px_1fr] gap-4">
+                            {/* Profile Card - Left Side */}
+                            <div className="flex flex-col h-full rounded-md bg-gradient-to-b from-muted/30 to-muted/20 p-4">
+                              <div className="text-lg font-bold">
+                                Garry Alexander
+                              </div>
+                              <p className="text-sm leading-tight text-muted-foreground mb-4 mt-2">
+                                A <strong>nihilist</strong> who loves to code and coffee ☕
+                              </p>
+                              <div className="grid grid-cols-2 gap-2 mt-auto">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:blur-[1px] transition-all duration-300"
+                                >
+                                  Notion
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:blur-[1px] transition-all duration-300"
+                                >
+                                  LinkedIn
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:blur-[1px] transition-all duration-300"
+                                >
+                                  Twitter
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:blur-[1px] transition-all duration-300"
+                                >
+                                  Email
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="hover:blur-[1px] transition-all duration-300 col-span-2"
+                                  asChild
+                                >
+                                  <a href="resume.pdf" target="_blank" rel="noopener noreferrer">
+                                    Resume
+                                  </a>
+                                </Button>
+                              </div>
+                            </div>
+
+                            {/* About Section - Right Side */}
+                            <div className="flex flex-col h-full mt-1">
+                              <div className="text-lg font-bold mt-3">
+                                About Me
+                              </div>
+                              <p className="text-sm leading-relaxed text-muted-foreground mt-2">
+                                A nihilist exploring the intersection of code and philosophy. Building thoughtful digital experiences while contemplating existence over coffee.
+                              </p>
+                            </div>
+                          </div>
+                        </div>
                       </NavigationMenuContent>
                     </NavigationMenuItem>
                     <NavigationMenuItem>
@@ -320,13 +310,13 @@ const Index = () => {
           title={
             <>
               <div className="flex flex-col items-center text-center gap-1">
-                <div className="flex flex-wrap items-center justify-center gap-2">
+                <div className="flex flex-wrap items-center justify-center gap-2 text-xs md:text-base">
                   <span>A</span>
                   <strong className="dark:text-white dark:drop-shadow-[0_0_0.3rem_#ffffff70]">front-end developer</strong>
                   <span>&</span>
                   <strong className="dark:text-white dark:drop-shadow-[0_0_0.3rem_#ffffff70]">nihilist</strong>
                 </div>
-                <div className="flex flex-wrap items-center justify-center gap-2">
+                <div className="flex flex-wrap items-center justify-center gap-2 text-xs md:text-base">
                   <span>who contemplate about</span>
                   <AnimatedTyping
                     words={["coffee.", "existence.", "space.", "futurism."]}

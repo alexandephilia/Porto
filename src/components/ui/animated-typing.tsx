@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 interface AnimatedTypingProps {
   words: string[];
   className?: string;
+  textSize?: string;
 }
 
-export const AnimatedTyping = ({ words, className = "" }: AnimatedTypingProps) => {
+export const AnimatedTyping = ({ words, className = "", textSize = "text-xs md:text-base" }: AnimatedTypingProps) => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
@@ -45,12 +46,12 @@ export const AnimatedTyping = ({ words, className = "" }: AnimatedTypingProps) =
   }, [displayText, isTyping, currentWordIndex, words]);
 
   return (
-    <div className={`inline-block relative ${className}`}>
-      <div className="inline-block whitespace-pre">
+    <div className={`inline-block relative ${className}`} style={{ color: 'white' }}>
+      <div className={`inline-block whitespace-pre [&_*]:!text-white ${textSize}`}>
         {displayText.split('').map((char, index) => (
           <motion.div
             key={`${key}-${index}`}
-            initial={isTyping ? { 
+            initial={isTyping ? {
               opacity: 0,
               filter: "blur(2px)",
               y: 5,
@@ -61,7 +62,7 @@ export const AnimatedTyping = ({ words, className = "" }: AnimatedTypingProps) =
               y: 0,
               scale: 1
             }}
-            animate={isTyping ? { 
+            animate={isTyping ? {
               opacity: 1,
               filter: "blur(0px)",
               y: 0,
@@ -82,15 +83,16 @@ export const AnimatedTyping = ({ words, className = "" }: AnimatedTypingProps) =
               willChange: "transform, opacity, filter",
               backfaceVisibility: "hidden",
               transform: "translateZ(0)",
+              color: 'white',
             }}
           >
             {char === ' ' ? '\u00A0' : char}
           </motion.div>
         ))}
       </div>
-      
+
       <motion.div
-        animate={{ 
+        animate={{
           opacity: [1, 0],
           transition: {
             duration: 0.6,
@@ -99,7 +101,7 @@ export const AnimatedTyping = ({ words, className = "" }: AnimatedTypingProps) =
             ease: "steps(2)"
           }
         }}
-        className="inline-block ml-[1px] w-[2px] h-[1.2em] bg-current align-middle"
+        className="inline-block ml-[1px] w-[2px] h-[1.2em] !bg-white align-middle"
         style={{
           willChange: "opacity",
           backfaceVisibility: "hidden",
